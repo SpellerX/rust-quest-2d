@@ -1,0 +1,107 @@
+/* Rust Quest 2D — tema escuro de jogo, PT-BR */
+:root {
+  --bg: #12141c;
+  --bg-panel: #1a1e2b;
+  --bg-elevated: #222840;
+  --border: #2e3550;
+  --text: #e8eaf2;
+  --text-dim: #9aa1bb;
+  --accent: #f74c00; /* laranja Rust */
+  --accent-2: #dea584;
+  --gold: #ffd166;
+  --green: #06d6a0;
+  --red: #ef476f;
+  --blue: #4cc9f0;
+  --radius: 10px;
+  --font-mono: 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100%;
+}
+
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+.code {
+  font-family: var(--font-mono);
+}
+
+/* Utilitários de painel */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.btn {
+  background: var(--bg-elevated);
+  color: var(--text);
+  padding: 0.55rem 1.1rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  transition: background 0.15s, transform 0.05s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #2a3150;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #ff5f1f;
+}
+
+.btn-gold {
+  background: transparent;
+  border-color: var(--gold);
+  color: var(--gold);
+}
