@@ -36,3 +36,4 @@ output/
 
 # Playwright / smoke-test artifacts
 output/
+.playwright-cli/
