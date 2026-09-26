@@ -13,11 +13,15 @@
         <input v-model="password" type="password" required autocomplete="current-password">
       </label>
 
-      <p v-if="errorMsg" class="auth-error">{{ errorMsg }}</p>
+      <InlineAlert v-if="errorMsg" tone="danger">{{ errorMsg }}</InlineAlert>
 
-      <button class="btn btn-primary" type="submit" :disabled="busy">
+      <button class="btn btn-primary auth-submit" type="submit" :disabled="busy" :aria-busy="busy">
         {{ busy ? 'Entrando…' : 'Entrar' }}
       </button>
+
+      <NuxtLink to="/recuperar-senha" class="forgot">
+        Esqueci a senha
+      </NuxtLink>
 
       <p class="auth-switch">
         Não tem conta? <NuxtLink to="/registro">Criar agora</NuxtLink>
@@ -68,15 +72,29 @@ async function onSubmit() {
 
 .auth-card {
   width: 100%;
-  max-width: 380px;
-  padding: 1.8rem;
+  max-width: 400px;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 40%), 0 0 36px rgb(239 128 80 / 8%);
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
 }
 
 .auth-card h1 {
   margin: 0;
+  font-size: 1.55rem;
 }
 
 .auth-sub {
@@ -84,38 +102,17 @@ async function onSubmit() {
   margin: 0;
 }
 
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.9rem;
-  color: var(--text-dim);
-}
-
-input {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  padding: 0.6rem 0.7rem;
-  font-size: 1rem;
-}
-
-input:focus {
-  outline: 2px solid var(--accent);
-  border-color: transparent;
-}
-
-.auth-error {
-  color: var(--red);
-  margin: 0;
-  font-size: 0.9rem;
-}
+.auth-submit { width: 100%; }
 
 .auth-switch {
   text-align: center;
   color: var(--text-dim);
   font-size: 0.9rem;
   margin: 0;
+}
+
+@media (max-width: 520px) {
+  .auth-page { min-height: 0; padding: 1.5rem 0; }
+  .auth-card { padding: 1.4rem 1.2rem; }
 }
 </style>

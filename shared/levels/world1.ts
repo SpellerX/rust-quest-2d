@@ -50,7 +50,7 @@ export const WORLD1_LEVELS: Level[] = [
     },
     learnAfter: {
       title: 'Você escreveu sua primeira chamada de função!',
-      body: 'Funções em Rust usam parênteses e vírgulas, e ; fecha cada passo do programa. O número dentro dos parênteses é o argumento — ele diz à função quanto work ela deve fazer.',
+      body: 'Funções em Rust usam parênteses e vírgulas, e ; fecha cada passo do programa. O número dentro dos parênteses é o argumento — ele diz à função quanto trabalho ela deve fazer.',
       bullets: [
         'mover_direita(10); = caminhar 10 casas',
         'Parênteses () recebem o argumento',

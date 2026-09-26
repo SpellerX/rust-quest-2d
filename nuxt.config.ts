@@ -3,6 +3,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@pinia/nuxt'],
+  css: ['~/assets/css/main.css'],
+  routeRules: {
+    '/mapa': { ssr: false },
+    '/nivel/**': { ssr: false },
+  },
   // <HUD>, <GameCanvas>… sem prefixo vindo da subpasta game/
   components: [{ path: '~/components', pathPrefix: false }],
   typescript: { strict: true },

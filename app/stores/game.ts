@@ -4,6 +4,7 @@ import { execute } from '#shared/interpreter'
 import { simulate } from '#shared/game/simulator'
 
 export type GamePhase = 'idle' | 'animating' | 'won' | 'lost'
+export type ProgressSyncState = 'idle' | 'saving' | 'saved' | 'error' | 'local'
 
 const CODE_KEY = (levelId: string) => `rq_code_${levelId}`
 
@@ -11,6 +12,7 @@ export const useGameStore = defineStore('game', () => {
   const level = ref<Level | null>(null)
   const code = ref('')
   const phase = ref<GamePhase>('idle')
+  const syncState = ref<ProgressSyncState>('idle')
   const lastError = ref<GameError | null>(null)
   const outcome = ref<Outcome | null>(null)
   const commands = ref<GameCommand[]>([])
@@ -31,6 +33,7 @@ export const useGameStore = defineStore('game', () => {
       code.value = l.starterCode
     }
     phase.value = 'idle'
+    syncState.value = 'idle'
     lastError.value = null
     outcome.value = null
     commands.value = []
@@ -54,6 +57,7 @@ export const useGameStore = defineStore('game', () => {
    */
   function run() {
     if (!level.value || phase.value === 'animating') return
+    syncState.value = 'idle'
     lastError.value = null
     emptyCode.value = false
 
@@ -90,6 +94,7 @@ export const useGameStore = defineStore('game', () => {
       }
       else {
         progress.applyLocalWin(level.value!.id, stars)
+        syncState.value = 'local'
       }
     }
     else {
@@ -101,6 +106,10 @@ export const useGameStore = defineStore('game', () => {
     const auth = useAuthStore()
     const progress = useProgressStore()
     if (!level.value || !auth.token) return
+    const submittedLevelId = level.value.id
+    const submittedCode = code.value
+    const submittedHints = hintsUsed.value
+    syncState.value = 'saving'
     try {
       const res = await $fetch<{
         success: boolean
@@ -114,25 +123,34 @@ export const useGameStore = defineStore('game', () => {
         method: 'POST',
         headers: { Authorization: `Bearer ${auth.token}` },
         body: {
-          levelId: level.value.id,
-          code: code.value,
-          hintsUsed: hintsUsed.value,
+          levelId: submittedLevelId,
+          code: submittedCode,
+          hintsUsed: submittedHints,
         },
       })
       if (res.success && res.stars != null) {
-        progress.applyLocalWin(level.value.id, res.stars)
+        progress.applyLocalWin(submittedLevelId, res.stars)
         if (res.xp != null) auth.updateUser({ xp: res.xp, totalStars: res.totalStars ?? 0 })
         if (res.unlockedLevelIds) progress.setUnlocked(res.unlockedLevelIds)
+        if (level.value?.id === submittedLevelId) syncState.value = 'saved'
       }
-      else if (res.error) {
-        // Revalidação do servidor discordou — mostra como erro amigável.
-        lastError.value = res.error
+      else {
+        if (level.value?.id === submittedLevelId) {
+          if (res.error) lastError.value = res.error
+          syncState.value = 'error'
+        }
       }
     }
     catch {
       // Sem rede: mantém a vitória local para não frustrar o jogador.
-      progress.applyLocalWin(level.value.id, localStars)
+      progress.applyLocalWin(submittedLevelId, localStars)
+      if (level.value?.id === submittedLevelId) syncState.value = 'error'
     }
+  }
+
+  function retrySync() {
+    if (phase.value !== 'won') return
+    void submitAttempt(computedStars())
   }
 
   function computedStars(): number {
@@ -162,12 +180,14 @@ export const useGameStore = defineStore('game', () => {
     setCode(level.value.starterCode)
     resetCounter.value++
     phase.value = 'idle'
+    syncState.value = 'idle'
     lastError.value = null
     outcome.value = null
   }
 
   function backToIdle() {
     phase.value = 'idle'
+    syncState.value = 'idle'
     lastError.value = null
     outcome.value = null
   }
@@ -176,6 +196,7 @@ export const useGameStore = defineStore('game', () => {
     level,
     code,
     phase,
+    syncState,
     lastError,
     outcome,
     commands,
@@ -188,6 +209,7 @@ export const useGameStore = defineStore('game', () => {
     setCode,
     run,
     finishAnimation,
+    retrySync,
     computedStars,
     useHint,
     revealHint,

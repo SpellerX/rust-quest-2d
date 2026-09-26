@@ -1,5 +1,10 @@
 <template>
-  <div ref="host" class="game-canvas" />
+  <div
+    ref="host"
+    class="game-canvas"
+    role="img"
+    aria-label="Cena do jogo com personagem, plataformas e objetivo. A execução do código controla o personagem."
+  />
 </template>
 
 <script setup lang="ts">
@@ -22,6 +27,7 @@ let game: GameLike | null = null
 onMounted(async () => {
   // Phaser toca `window` no import — dinâmico aqui dentro + uso client-only.
   const Phaser = (await import('phaser')).default
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const map = props.map
   const cols = Math.max(...map.map(r => r.length))
@@ -70,11 +76,12 @@ onMounted(async () => {
       this.player = this.add.sprite(cellCX(px), cellBottom(py), 'hero', 0)
       this.player.setOrigin(0.5, 1)
       this.player.setDepth(10)
-      this.player.play('hero-idle')
+      if (reducedMotion) this.player.setFrame(0)
+      else this.player.play('hero-idle')
 
       // Câmera segue o jogador; mapa pequeno fica centralizado (scroll travado)
       const cam = this.cameras.main
-      cam.setBounds(0, 0, VIEW_W, Math.max(VIEW_H, mapH))
+      cam.setBounds(0, 0, Math.max(VIEW_W, mapW + OX), Math.max(VIEW_H, mapH + OY))
       cam.setOrigin(0.5, 0.5)
       cam.startFollow(this.player, true, 0.1, 0.1)
 
@@ -98,12 +105,16 @@ onMounted(async () => {
             targets: this.player,
             x: cellCX(cx),
             y: targetY,
-            duration: durationMs,
+            duration: reducedMotion ? 0 : durationMs,
             ease: 'Linear',
           })
         },
         deathFlash: async () => {
           this.setState('hit')
+          if (reducedMotion) {
+            this.player.setAlpha(0.45)
+            return
+          }
           this.cameras.main.shake(280, 0.014)
           await new Promise<void>(res => setTimeout(res, 420))
           await this.tween({
@@ -139,7 +150,7 @@ onMounted(async () => {
 
       // Estrelas cintilando
       const stars = this.add.container(0, 0).setScrollFactor(0).setDepth(-9)
-      for (let i = 0; i < 48; i++) {
+      for (let i = 0; i < (reducedMotion ? 0 : 48); i++) {
         const s = this.add.rectangle(
           Phaser.Math.Between(4, VIEW_W - 4),
           Phaser.Math.Between(4, VIEW_H * 0.7),
@@ -225,14 +236,16 @@ onMounted(async () => {
           if (cellAt(x, y) === 'o') {
             const coin = this.add.circle(cellCX(x), cellBottom(y) - TILE / 2, TILE * 0.26, 0xffd166)
             coin.setDepth(4)
-            this.tweens.add({
-              targets: coin,
-              y: coin.y - 7,
-              duration: 900,
-              yoyo: true,
-              repeat: -1,
-              ease: 'Sine.easeInOut',
-            })
+            if (!reducedMotion) {
+              this.tweens.add({
+                targets: coin,
+                y: coin.y - 7,
+                duration: 900,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut',
+              })
+            }
           }
         }
       }
@@ -248,7 +261,8 @@ onMounted(async () => {
             const npc = this.add.sprite(cellCX(x), cellBottom(y), kind, 0)
             npc.setOrigin(0.5, 1)
             npc.setDepth(5)
-            npc.play(`${kind}-idle`)
+            if (reducedMotion) npc.setFrame(0)
+            else npc.play(`${kind}-idle`)
           }
         }
       }
@@ -260,6 +274,10 @@ onMounted(async () => {
     parent: host.value!,
     width: VIEW_W,
     height: VIEW_H,
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     pixelArt: true,
     backgroundColor: '#0b1026',
     scene: LevelScene,
@@ -276,15 +294,18 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .game-canvas {
+  width: 100%;
+  aspect-ratio: 3 / 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0b1026;
-  border-radius: var(--radius);
+  background: #101a27;
   overflow: hidden;
 }
 
 .game-canvas :deep(canvas) {
+  display: block;
+  width: 100% !important;
   max-width: 100%;
   height: auto !important;
 }

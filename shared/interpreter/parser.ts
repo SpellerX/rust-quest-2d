@@ -1,12 +1,15 @@
 import type { Span } from '../types'
-import type { BinaryOp, Expr, Program, Statement } from './ast'
+import type { BinaryOp, Block, Expr, FnDecl, If, Program, Statement } from './ast'
 import { fail } from './errors'
 import { tokenize } from './lexer'
 import type { PrimitiveType } from './game-api'
 import type { Token } from './tokens'
 
 const COMPARISON_OPS = new Set(['==', '!=', '<', '>', '<=', '>='])
-const PRIMITIVE_TYPES = new Set<PrimitiveType>(['i32', 'f64', 'bool'])
+const PRIMITIVE_TYPES = new Set<PrimitiveType>(['i32', 'f64', 'bool', 'String'])
+
+/** Palavras-chave que iniciam um statement (usado para detectar tail de bloco). */
+const STMT_KEYWORDS = new Set(['let', 'if', 'while', 'loop', 'for', 'return', 'break', 'continue'])
 
 class Parser {
   private pos = 0
@@ -52,21 +55,64 @@ class Parser {
     return this.next()
   }
 
+  private expectKeyword(value: string): Token {
+    if (!this.isKeyword(value)) {
+      fail('E0002', this.peek().span, value)
+    }
+    return this.next()
+  }
+
   parseProgram(): Program {
     const body: Statement[] = []
     while (this.peek().type !== 'eof') {
+      if (this.isKeyword('fn')) {
+        body.push(this.parseFn())
+        continue
+      }
       body.push(this.parseStatement())
     }
     return { kind: 'Program', body }
   }
 
+  /** Início de um statement simples (sem `fn`, que é item de topo). */
+  private startsStatement(): boolean {
+    const tok = this.peek()
+    if (tok.type === 'keyword' && STMT_KEYWORDS.has(tok.value)) return true
+    // Atribuição: ident seguido de `=` simples.
+    return tok.type === 'ident' && this.isOp('=', 1)
+  }
+
   private parseStatement(): Statement {
     if (this.isKeyword('let')) return this.parseLet()
+    if (this.isKeyword('if')) return this.parseIf()
+    if (this.isKeyword('while')) return this.parseWhile()
+    if (this.isKeyword('loop')) return this.parseLoop()
+    if (this.isKeyword('for')) return this.parseFor()
+    if (this.isKeyword('return')) return this.parseReturn()
+    if (this.isKeyword('break')) {
+      const tok = this.next()
+      this.expectPunct(';')
+      return { kind: 'Break', span: tok.span }
+    }
+    if (this.isKeyword('continue')) {
+      const tok = this.next()
+      this.expectPunct(';')
+      return { kind: 'Continue', span: tok.span }
+    }
 
     // Atribuição: `nome = expr;` (só se for um `=` simples, não `==`)
     if (this.peek().type === 'ident' && this.isOp('=', 1)) return this.parseAssign()
 
     return this.parseExprStmt()
+  }
+
+  private parseType(): PrimitiveType {
+    const tok = this.peek()
+    if (tok.type !== 'keyword' || !PRIMITIVE_TYPES.has(tok.value as PrimitiveType)) {
+      fail('E0002', tok.span, 'i32, f64, bool ou String')
+    }
+    this.next()
+    return tok.value as PrimitiveType
   }
 
   private parseLet(): Statement {
@@ -83,12 +129,7 @@ class Parser {
     let typeAnn: PrimitiveType | undefined
     if (this.isPunct(':')) {
       this.next()
-      const typeTok = this.peek()
-      if (typeTok.type !== 'keyword' || !PRIMITIVE_TYPES.has(typeTok.value as PrimitiveType)) {
-        fail('E0002', typeTok.span, 'i32, f64 ou bool')
-      }
-      typeAnn = typeTok.value as PrimitiveType
-      this.next()
+      typeAnn = this.parseType()
     }
 
     this.expectOp('=')
@@ -121,8 +162,146 @@ class Parser {
     return { kind: 'ExprStmt', expr, span: expr.span }
   }
 
+  private parseReturn(): Statement {
+    const tok = this.next() // return
+    if (this.isPunct(';')) {
+      this.next()
+      return { kind: 'Return', span: tok.span }
+    }
+    const value = this.parseExpr()
+    this.expectPunct(';')
+    return { kind: 'Return', value, span: tok.span }
+  }
+
+  /**
+   * Bloco `{ ... }` com escopo próprio. A última expressão SEM `;` é a
+   * "tail" (return implícito do Rust).
+   */
+  private parseBlock(): Block {
+    const open = this.expectPunct('{')
+    const stmts: Statement[] = []
+    let tail: Expr | undefined
+
+    while (!this.isPunct('}')) {
+      if (this.peek().type === 'eof') {
+        fail('E0002', this.peek().span, '}')
+      }
+      if (this.startsStatement()) {
+        stmts.push(this.parseStatement())
+        continue
+      }
+      // Expressão: com `;` vira statement, sem `;` antes de `}` é a tail.
+      const expr = this.parseExpr()
+      if (this.isPunct(';')) {
+        this.next()
+        stmts.push({ kind: 'ExprStmt', expr, span: expr.span })
+      }
+      else if (this.isPunct('}')) {
+        tail = expr
+      }
+      else {
+        fail('E0002', this.peek().span, ';')
+      }
+    }
+    const close = this.next() // }
+    return { kind: 'Block', stmts, tail, span: { ...open.span, end: close.span.end } }
+  }
+
+  private parseIf(): If {
+    const tok = this.next() // if
+    const cond = this.parseExpr()
+    const then = this.parseBlock()
+    let otherwise: Block | If | undefined
+    if (this.isKeyword('else')) {
+      this.next()
+      otherwise = this.isKeyword('if') ? this.parseIf() : this.parseBlock()
+    }
+    return { kind: 'If', cond, then, otherwise, span: tok.span }
+  }
+
+  private parseWhile(): Statement {
+    const tok = this.next() // while
+    const cond = this.parseExpr()
+    const body = this.parseBlock()
+    return { kind: 'While', cond, body, span: tok.span }
+  }
+
+  private parseLoop(): Statement {
+    const tok = this.next() // loop
+    const body = this.parseBlock()
+    return { kind: 'Loop', body, span: tok.span }
+  }
+
+  private parseFor(): Statement {
+    const tok = this.next() // for
+    const varTok = this.peek()
+    if (varTok.type !== 'ident') fail('E0002', varTok.span, 'variável')
+    this.next()
+    this.expectKeyword('in')
+    const from = this.parseAdd()
+    this.expectOp('..')
+    const to = this.parseAdd()
+    const body = this.parseBlock()
+    return { kind: 'For', varName: varTok.value, from, to, body, span: tok.span }
+  }
+
+  private parseFn(): FnDecl {
+    const tok = this.next() // fn
+    const nameTok = this.peek()
+    if (nameTok.type !== 'ident') fail('E0002', nameTok.span, 'nome da função')
+    this.next()
+
+    this.expectPunct('(')
+    const params = []
+    if (!this.isPunct(')')) {
+      while (true) {
+        const pTok = this.peek()
+        if (pTok.type !== 'ident') fail('E0002', pTok.span, 'parâmetro')
+        this.next()
+        this.expectPunct(':')
+        const type = this.parseType()
+        params.push({ name: pTok.value, type, span: pTok.span })
+        if (this.isPunct(',')) {
+          this.next()
+          continue
+        }
+        break
+      }
+    }
+    this.expectPunct(')')
+
+    let retType: PrimitiveType | undefined
+    if (this.isOp('->')) {
+      this.next()
+      retType = this.parseType()
+    }
+
+    const body = this.parseBlock()
+    return { kind: 'FnDecl', name: nameTok.value, params, retType, body, span: tok.span }
+  }
+
   private parseExpr(): Expr {
-    return this.parseComparison()
+    return this.parseOr()
+  }
+
+  private parseOr(): Expr {
+    let left = this.parseAnd()
+    while (this.isOp('||')) {
+      const op = this.next()
+      const right = this.parseAnd()
+      left = { kind: 'Binary', op: '||', left, right, span: op.span }
+    }
+    return left
+  }
+
+  private parseAnd(): Expr {
+    let left = this.parseComparison()
+    while (this.isOp('&&')) {
+      const op = this.next()
+      const right = this.parseComparison()
+      left = { kind: 'Binary', op: '&&', left, right, span: op.span }
+    }
+    return left
   }
 
   private parseComparison(): Expr {
@@ -165,6 +344,16 @@ class Parser {
       const operand = this.parseUnary()
       return { kind: 'Unary', op: '-', operand, span: op.span }
     }
+    if (this.isOp('!')) {
+      const op = this.next()
+      const operand = this.parseUnary()
+      return { kind: 'Unary', op: '!', operand, span: op.span }
+    }
+    if (this.isPunct('&')) {
+      const op = this.next()
+      const operand = this.parseUnary()
+      return { kind: 'Unary', op: '&', operand, span: op.span }
+    }
     return this.parsePrimary()
   }
 
@@ -178,6 +367,10 @@ class Parser {
     if (tok.type === 'float') {
       this.next()
       return { kind: 'Literal', value: Number(tok.value), litType: 'f64', span: tok.span }
+    }
+    if (tok.type === 'string') {
+      this.next()
+      return { kind: 'Literal', value: tok.value, litType: 'String', span: tok.span }
     }
     if (tok.type === 'keyword' && (tok.value === 'true' || tok.value === 'false')) {
       this.next()

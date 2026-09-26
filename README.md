@@ -4,11 +4,14 @@ Plataforma gamificada de ensino de Rust para iniciantes: um jogo de
 plataforma 2D **vertical** onde você **escreve código Rust do zero** num
 console e o boneco pixel-art executa os comandos gerados pelo seu código.
 
-> Escopo atual: **MVP com pedagogia** — Mundos 1 e 2 (10 níveis), cada nível
-> com card *"O que você vai aprender"*, dicas progressivas por nível e
+> Escopo atual: **Mundos 1–6 (30 níveis)** com pedagogia completa —
+> card *"O que você vai aprender"*, dicas progressivas por nível e
 > resumo *"Você aprendeu"* na vitória; mapas multi-plataforma com pulo em
 > arco, queda, câmera que segue o personagem, NPCs animados e backend
-> JWT + MongoDB Atlas.
+> JWT + MongoDB Atlas. O interpretador cobre do `let` básico até
+> ownership: `if`/`else`, `loop`/`while`/`for`, `fn` com retorno e
+> `String` com move/empréstimo (`&`) — seguindo a progressão do livro
+> oficial *The Rust Programming Language*.
 
 ## O que diferencia
 
@@ -31,8 +34,14 @@ console e o boneco pixel-art executa os comandos gerados pelo seu código.
 - **CodeMirror 6** — editor de código com highlight de Rust
 - **MongoDB Atlas + Mongoose** — usuários, progresso e histórico
 - **Interpretador TypeScript próprio** em `shared/` — lexer → parser →
-  checker → executor, usado **tanto pelo navegador quanto pelo servidor**
-- **Vitest** — 102 testes (interpretador, simulador vertical, níveis)
+  checker → executor, usado **tanto pelo navegador quanto pelo servidor**;
+  subconjunto do Rust com `if`/`else`, laços, `fn` do jogador e
+  ownership de `String` (move/`&`, erro E0382)
+- **Vitest** — 318 testes (interpretador, simulador vertical, níveis)
+
+## Interface e Design System
+
+Para manter a identidade visual e os padrões de interação ao adicionar novas telas e componentes, consulte o [guia do Design System](docs/design-system.md).
 
 ## Arquitetura em uma frase
 
@@ -46,7 +55,7 @@ app/           páginas, componentes (GameCanvas, CodeConsole…), stores Pinia
 app/components/game/textures.ts   pixel-art procedural do herói e NPCs
 shared/        interpretador, simulador vertical, níveis  ← client e server
 server/        rotas Nitro (auth, levels, progress, attempts), models
-tests/         Vitest (102 testes)
+tests/         Vitest (318 testes)
 ```
 
 ## Como rodar
@@ -66,15 +75,18 @@ NUXT_JWT_SECRET=<segredo de 32+ caracteres>
 NUXT_MONGODB_URI=<connection string do Atlas, com /rustquest antes do ?>
 ```
 
-Sem o `NUXT_MONGODB_URI` o jogo continua **jogável offline** (progresso
-local), mas auth/progresso respondem `503` rápido — nada trava.
+O acesso ao mapa e aos níveis exige uma conta autenticada, e o progresso é
+salvo no MongoDB. Sem `NUXT_MONGODB_URI`, cadastro, login e sincronização de
+progresso não estarão disponíveis (as rotas retornam `503`). A execução do
+código acontece no navegador, mas o produto **não oferece um modo offline
+completo**.
 
 ## Comandos úteis
 
 | Comando | O que faz |
 |---|---|
 | `npm run dev` | servidor de desenvolvimento |
-| `npm test` | 102 testes (interpretador, simulador, níveis) |
+| `npm test` | 318 testes (interpretador, simulador, níveis) |
 | `npm run typecheck` | TypeScript estrito (vue-tsc) |
 
 ## Conceito do jogo (MVP)
@@ -95,7 +107,17 @@ mover_direita(passos);   // i32
 mover_esquerda(passos);  // i32
 pular(forca);            // i32, opcional (default 1) — cobre vão de f casas, sobe 1 degrau com f ≥ 2
 esperar(segundos);       // f64
+falar(mensagem);         // String — o herói "fala" (pausa a animação)
 ```
+
+### Linguagem (subconjunto do Rust, na ordem dos mundos)
+
+Mundos 1–2: `let`/`let mut`, tipos `i32`/`f64`/`bool`, operadores ·
+Mundo 3: `if`/`else`, comparações, `&&`/`||`/`!` ·
+Mundo 4: `loop`/`while`/`for i in 0..n`, `break`/`continue` ·
+Mundo 5: `fn` do jogador com parâmetros e retorno (`-> i32`, return
+implícito) · Mundo 6: `String`, posse por valor (move → E0382) e
+empréstimo `&`.
 
 ### Mapa ASCII (multi-linha, vertical)
 
@@ -109,8 +131,10 @@ qualquer altura vence. Vitória é decidida **sempre** pelo simulador
 
 ## Roadmap (do plano de produto)
 
-- **MVP atual (feito)**: Mundo 1–2 completos com pedagogia, plataforma
-  vertical, pixel-art, auth + progresso no Atlas.
-- **Próxima fase**: Mundos 3–6 (`if`/loops/funções/ownership básico).
-- **Depois**: Mundos 7–12, avaliar sandbox real para borrow checker.
+- **Feito**: Mundos 1–6 completos com pedagogia (30 níveis), plataforma
+  vertical, pixel-art, auth + progresso no Atlas, interpretador com
+  if/laços/fn/ownership básico.
+- **Próxima fase**: Mundos 7–12 (structs/enums, coleções, erros,
+  traits/generics).
+- **Depois**: avaliar sandbox real para borrow checker completo.
 - **Polimento**: som, tutorial guiado, onboarding.

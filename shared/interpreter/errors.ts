@@ -18,9 +18,9 @@ interface FriendlySpec {
 }
 
 /**
- * Tabela de erros do subconjunto MVP.
+ * Tabela de erros do interpretador.
  * Códigos imitam a numeração real do Rust de propósito (familiaridade futura);
- * erros de borrow/move (E0382 etc.) ficam para os mundos avançados.
+ * E0001–E0004 e E0900/E0901 são códigos próprios do jogo.
  * Mantém docs/erros.md em sincronia.
  */
 const ERROR_TABLE: Record<string, FriendlySpec> = {
@@ -40,6 +40,15 @@ const ERROR_TABLE: Record<string, FriendlySpec> = {
       if (ctx === 'expressão') return 'Falta um valor depois do =.'
       if (ctx === ',') return 'Separe os argumentos com vírgula (,).'
       if (ctx === 'variável') return 'Depois de let vem o nome da variável (letras, sem espaço).'
+      if (ctx === '{') return 'Faltou abrir a chave { do bloco.'
+      if (ctx === '}') return 'Faltou fechar a chave } do bloco.'
+      if (ctx === '->') return 'Para a função retornar um valor, use: -> tipo (ex.: -> i32).'
+      if (ctx === 'in') return 'Depois da variável do for vem in: for i in 0..5 { ... }'
+      if (ctx === '..') return 'O laço for usa um intervalo com dois pontos: 0..5 (sem o =).'
+      if (ctx === ':') return 'Faltou os dois-pontos : entre nome e tipo (ex.: x: i32).'
+      if (ctx?.startsWith('i32, f64')) return 'Tipo inválido. Use i32, f64, bool ou String.'
+      if (ctx === 'nome da função') return 'Depois de fn vem o nome da função.'
+      if (ctx === 'parâmetro') return 'Parâmetros têm a forma nome: tipo (ex.: n: i32).'
       return `Faltou algo aqui: ${ctx}.`
     },
   },
@@ -48,11 +57,23 @@ const ERROR_TABLE: Record<string, FriendlySpec> = {
     message: ctx => ctx || 'Expressão solta que não faz nada',
     friendly: ctx => ctx || 'Esse valor não faz nada sozinho. Guarde-o numa variável com let ou use dentro de um comando do jogo.',
   },
+  E0004: {
+    stage: 'check',
+    message: ctx => `\`${ctx}\` fora de um laço`,
+    friendly: ctx => `\`${ctx}\` só pode ser usado dentro de loop, while ou for — aqui não existe laço para sair.`,
+    hint: () => 'Coloque o código dentro de um laço (loop, while ou for).',
+  },
   E0412: {
     stage: 'check',
     message: ctx => `Variável não declarada: ${ctx}`,
     friendly: ctx => `A variável ${ctx} não existe. Você criou ela com let?`,
     hint: () => 'Declare antes de usar: let nome = valor;',
+  },
+  E0382: {
+    stage: 'check',
+    message: ctx => `Valor movido e usado de novo: ${ctx}`,
+    friendly: ctx => `${ctx} foi movida: ao passar um texto por valor, a posse transfere e a variável original fica indisponível.`,
+    hint: () => 'Passe uma referência em vez do valor: &variavel (empréstimo).',
   },
   E0384: {
     stage: 'check',
@@ -69,7 +90,17 @@ const ERROR_TABLE: Record<string, FriendlySpec> = {
   E0425: {
     stage: 'check',
     message: ctx => `Função desconhecida: ${ctx}`,
-    friendly: ctx => `${ctx} não é um comando do jogo. Veja os comandos disponíveis no painel ao lado.`,
+    friendly: ctx => `${ctx} não existe: não é um comando do jogo nem uma fn que você definiu.`,
+  },
+  E0428: {
+    stage: 'check',
+    message: ctx => `Definição duplicada: ${ctx}`,
+    friendly: ctx => `${ctx} já existe. Escolha outro nome para a sua fn — não dá para definir duas vezes.`,
+  },
+  E0572: {
+    stage: 'check',
+    message: () => 'return fora de função',
+    friendly: () => 'return só existe dentro de uma fn. No programa principal, os comandos já rodam na ordem escrita.',
   },
   E0061: {
     stage: 'check',

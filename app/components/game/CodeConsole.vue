@@ -4,21 +4,22 @@
     <div class="actions">
       <button
         class="btn btn-primary"
+        type="button"
         :disabled="disabled"
         @click="$emit('run')"
       >
-        ▶ Executar
+        <span aria-hidden="true">▶</span> Executar
       </button>
-      <button class="btn" :disabled="disabled" @click="$emit('reset')">
-        ↺ Recomeçar
+      <button class="btn" type="button" :disabled="disabled" @click="$emit('reset')">
+        <span aria-hidden="true">↺</span> Recomeçar
       </button>
-      <span class="hint-text">Ctrl+Enter executa</span>
+      <span id="editor-help" class="hint-text">Ctrl + Enter ou ⌘ + Enter executa</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { EditorState } from '@codemirror/state'
+import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 import { rust } from '@codemirror/lang-rust'
@@ -37,6 +38,7 @@ const emit = defineEmits<{
 
 const editorHost = ref<HTMLDivElement | null>(null)
 let view: EditorView | null = null
+const editable = new Compartment()
 
 onMounted(() => {
   if (!editorHost.value) return
@@ -48,6 +50,12 @@ onMounted(() => {
         basicSetup,
         rust(),
         oneDark,
+        editable.of(EditorView.editable.of(!props.disabled)),
+        EditorView.contentAttributes.of({
+          'aria-label': 'Editor de código Rust',
+          'aria-describedby': 'editor-help',
+          spellcheck: 'false',
+        }),
         keymap.of([
           {
             key: 'Mod-Enter',
@@ -85,6 +93,13 @@ watch(
   },
 )
 
+watch(
+  () => props.disabled,
+  (disabled) => {
+    view?.dispatch({ effects: editable.reconfigure(EditorView.editable.of(!disabled)) })
+  },
+)
+
 onBeforeUnmount(() => {
   view?.destroy()
   view = null
@@ -105,7 +120,8 @@ onBeforeUnmount(() => {
 }
 
 .editor :deep(.cm-editor) {
-  max-height: 320px;
+  min-height: 200px;
+  max-height: min(360px, 44vh);
 }
 
 .editor :deep(.cm-scroller) {
@@ -115,11 +131,17 @@ onBeforeUnmount(() => {
 .actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.7rem;
 }
 
 .hint-text {
   color: var(--text-dim);
   font-size: 0.8rem;
+}
+
+@media (max-width: 520px) {
+  .actions .btn { flex: 1; }
+  .hint-text { width: 100%; text-align: center; }
 }
 </style>

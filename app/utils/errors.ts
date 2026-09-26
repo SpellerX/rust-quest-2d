@@ -2,10 +2,12 @@
 export function extractApiError(e: unknown, fallback: string): string {
   if (e && typeof e === 'object') {
     const err = e as {
-      data?: { error?: { message?: string } }
+      data?: { error?: { message?: string }; message?: string; statusMessage?: string }
       status?: number
     }
     if (err.data?.error?.message) return err.data.error.message
+    if (err.data?.message) return err.data.message
+    if (err.data?.statusMessage) return err.data.statusMessage
     if (err.status === 404) {
       return 'Serviço indisponível: o backend ainda não está no ar (Fase 2).'
     }

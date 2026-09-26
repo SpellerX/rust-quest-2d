@@ -11,6 +11,8 @@ export type GameCommand =
   | { type: 'move'; direction: 'right' | 'left'; steps: number; src: Span }
   | { type: 'jump'; force: number; src: Span }
   | { type: 'wait'; durationMs: number; src: Span }
+  /** Fala do herói: sem efeito físico (simulador ignora), animação pausa. */
+  | { type: 'speak'; text: string; src: Span }
 
 export type ErrorStage = 'lex' | 'parse' | 'check' | 'exec'
 

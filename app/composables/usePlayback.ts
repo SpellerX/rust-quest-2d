@@ -68,6 +68,12 @@ export async function playSequence(
       await delay(cmd.durationMs)
       continue
     }
+    if (cmd.type === 'speak') {
+      // O herói "fala" (pausa breve) — o texto é didático, sem balão no MVP.
+      s.setState('idle')
+      await delay(500)
+      continue
+    }
     if (cmd.type === 'jump') {
       // Só prepara o estado — o arco anima nas células 'jump' do mover seguinte.
       continue

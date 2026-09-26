@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { connectDB } from '../../utils/db'
 import { signToken } from '../../utils/jwt'
+import { generateRecoveryCode } from '../../utils/recovery'
 import { User } from '../../models/User'
 
 export default defineEventHandler(async (event) => {
@@ -27,11 +28,18 @@ export default defineEventHandler(async (event) => {
   }
 
   const passwordHash = await bcrypt.hash(password, 10)
-  const user = await User.create({ email, username, passwordHash })
+  const recoveryCode = generateRecoveryCode()
+  const user = await User.create({
+    email,
+    username,
+    passwordHash,
+    recoveryCodeHash: await bcrypt.hash(recoveryCode, 10),
+  })
 
   const token = signToken({ sub: user._id.toString(), username: user.username })
   return {
     token,
+    recoveryCode,
     user: {
       id: user._id.toString(),
       email: user.email,

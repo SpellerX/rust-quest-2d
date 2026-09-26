@@ -1,33 +1,92 @@
-/* Rust Quest 2D — tema escuro de jogo, PT-BR */
+/* Rust Quest 2D — uma oficina de código dentro de uma aventura pixel-art. */
+@import '../fonts/fonts.css';
+
 :root {
-  --bg: #12141c;
-  --bg-panel: #1a1e2b;
-  --bg-elevated: #222840;
-  --border: #2e3550;
-  --text: #e8eaf2;
-  --text-dim: #9aa1bb;
-  --accent: #f74c00; /* laranja Rust */
-  --accent-2: #dea584;
-  --gold: #ffd166;
-  --green: #06d6a0;
-  --red: #ef476f;
-  --blue: #4cc9f0;
-  --radius: 10px;
+  color-scheme: dark;
+  --bg: #0d1514;
+  --bg-panel: #15201e;
+  --bg-elevated: #202d29;
+  --border: #34433d;
+  --border-bright: #53665b;
+  --text: #f3f3e9;
+  --text-dim: #b7c2b6;
+  --accent: #ef8050;
+  --accent-deep: #c95636;
+  --accent-2: #f1c49a;
+  --gold: #f0c96d;
+  --green: #78d6a0;
+  --red: #ff7a7a;
+  --blue: #77d4df;
+  --radius: 8px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-pixel: 'Press Start 2P', 'Cascadia Code', Consolas, monospace;
   --font-mono: 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+  --glow: 0 4px 18px rgb(239 128 80 / 22%);
+  --shadow-panel: 0 8px 24px rgb(0 0 0 / 28%);
 }
 
 * {
   box-sizing: border-box;
 }
 
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgb(239 128 80 / 45%);
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-bright) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
   color: var(--text);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body);
   min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Atmosfera: brilho laranja em cima à esquerda, ciano frio à direita */
+body {
+  background:
+    radial-gradient(850px 420px at 8% -10%, rgb(120 214 160 / 8%), transparent 68%),
+    radial-gradient(780px 460px at 94% 0%, rgb(239 128 80 / 7%), transparent 66%),
+    var(--bg);
+  background-attachment: fixed;
 }
 
 a {
@@ -59,6 +118,18 @@ h1,
 h2,
 h3 {
   margin-top: 0;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+/* Rótulo pixel — exclusivo para micro-labels (badge, tag, marca) */
+.pixel {
+  font-family: var(--font-pixel);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  text-transform: uppercase;
 }
 
 .code {
@@ -70,19 +141,29 @@ h3 {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-panel);
 }
 
 .btn {
   background: var(--bg-elevated);
   color: var(--text);
-  padding: 0.55rem 1.1rem;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
   font-size: 0.95rem;
+  font-weight: 600;
   border: 1px solid var(--border);
-  transition: background 0.15s, transform 0.05s;
+  border-radius: var(--radius);
+  transition: background 0.15s, transform 0.12s, border-color 0.15s, box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-decoration: none;
 }
 
 .btn:hover:not(:disabled) {
-  background: #2a3150;
+  background: var(--bg-elevated);
+  border-color: var(--border-bright);
 }
 
 .btn:active:not(:disabled) {
@@ -90,18 +171,106 @@ h3 {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: linear-gradient(180deg, #f39468, var(--accent-deep));
   border-color: transparent;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: var(--glow);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #ff5f1f;
+  background: linear-gradient(180deg, #f39468, #d85e3e);
+  box-shadow: 0 6px 22px rgb(239 128 80 / 32%);
 }
 
 .btn-gold {
   background: transparent;
   border-color: var(--gold);
   color: var(--gold);
+}
+
+.inline-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.inline-alert__icon {
+  flex: 0 0 1.2rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.inline-alert--danger {
+  border-color: rgb(255 122 122 / 55%);
+  border-left-color: var(--red);
+}
+
+.inline-alert--danger .inline-alert__icon { color: var(--red); }
+.inline-alert--warning { border-left-color: var(--gold); }
+.inline-alert--warning .inline-alert__icon { color: var(--gold); }
+.inline-alert--success { border-left-color: var(--green); }
+.inline-alert--success .inline-alert__icon { color: var(--green); }
+.inline-alert--info { border-left-color: var(--blue); }
+.inline-alert--info .inline-alert__icon { color: var(--blue); }
+
+.auth-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.auth-card input:focus-visible {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgb(240 201 109 / 22%);
+}
+
+.auth-card input[aria-invalid='true'] {
+  border-color: var(--red);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

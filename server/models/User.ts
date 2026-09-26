@@ -4,6 +4,8 @@ export interface UserDoc {
   email: string
   username: string
   passwordHash: string
+  /** Código de recuperação (bcrypt) — presente em contas pós-feature. */
+  recoveryCodeHash?: string
   xp: number
   totalStars: number
   createdAt: Date
@@ -15,6 +17,7 @@ const userSchema = new mongoose.Schema<UserDoc>(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     username: { type: String, required: true, trim: true, minlength: 3, maxlength: 20 },
     passwordHash: { type: String, required: true },
+    recoveryCodeHash: { type: String },
     xp: { type: Number, default: 0 },
     totalStars: { type: Number, default: 0 },
   },

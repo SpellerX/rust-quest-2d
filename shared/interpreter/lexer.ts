@@ -47,6 +47,20 @@ export function tokenize(source: string): Token[] {
     const startLine = line
     const startCol = col
 
+    // Strings "..." (sem escapes — subconjunto didático)
+    if (ch === '"') {
+      advance()
+      const valStart = i
+      while (i < source.length && source[i] !== '"' && source[i] !== '\n') advance()
+      if (source[i] !== '"') {
+        fail('E0001', spanAt(start, startLine, startCol), 'string fechada com "')
+      }
+      const value = source.slice(valStart, i)
+      advance() // fecha aspas
+      tokens.push({ type: 'string', value, span: spanAt(start, startLine, startCol) })
+      continue
+    }
+
     // Números (int ou float)
     if (/[0-9]/.test(ch)) {
       while (i < source.length && /[0-9]/.test(source[i]!)) advance()

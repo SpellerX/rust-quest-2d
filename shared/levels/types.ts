@@ -15,7 +15,7 @@ export interface ConceptBlock {
 export interface Level {
   /** ex.: 'w1-l1' */
   id: string
-  world: 1 | 2
+  world: 1 | 2 | 3 | 4 | 5 | 6
   /** ordem dentro do mundo (1..5) */
   order: number
   title: string
@@ -27,7 +27,8 @@ export interface Level {
   allowedFunctions: string[]
   /**
    * Só comentários-guia (zero código executável) — o jogador escreve tudo.
-   * Exceção: w1-l3 é propositalmente código quebrado (lição do E0384).
+   * Exceções: w1-l3 (código quebrado, lição do E0384) e w6-l2 (lição do
+   * E0382 — uso após move).
    */
   starterCode: string
   /** Solução completa escrita do zero (usada por "Mostrar exemplo" e testes). */

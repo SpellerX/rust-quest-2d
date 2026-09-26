@@ -1,25 +1,47 @@
 <template>
-  <div v-if="level" class="level-page">
+  <ClientOnly>
+    <div v-if="level" class="level-page">
     <HUD
       :level="level"
       :stars="starsNow"
       :xp="auth.user?.xp ?? progress.xp"
     />
 
-    <div class="game-grid">
-      <div class="main-col">
-        <GameCanvas :key="level.id" :map="level.map" />
+    <section class="level-narrative" aria-label="Narrativa do nível">
+      <span class="narrative-mark" aria-hidden="true">✦</span>
+      <p>{{ level.narrative }}</p>
+    </section>
 
-        <ErrorDisplay
-          :error="game.lastError"
-          :hint-visible="hintRevealed"
-          @use-hint="onUseHint"
-        />
+    <nav class="mobile-switch" aria-label="Área do nível">
+      <button
+        class="switch-button"
+        :class="{ selected: mobilePane === 'code' }"
+        type="button"
+        :aria-pressed="mobilePane === 'code'"
+        @click="mobilePane = 'code'"
+      >
+        <span aria-hidden="true">⌨</span> Código
+      </button>
+      <button
+        class="switch-button"
+        :class="{ selected: mobilePane === 'scene' }"
+        type="button"
+        :aria-pressed="mobilePane === 'scene'"
+        @click="mobilePane = 'scene'"
+      >
+        <span aria-hidden="true">🗺️</span> Cena
+      </button>
+    </nav>
 
-        <div v-if="game.emptyCode" class="empty-notice panel">
-          ✍️ Seu código ainda não tem comandos — escreva no console e clique em Executar.
-        </div>
-
+    <div class="game-grid" :class="`mobile-pane-${mobilePane}`">
+      <section class="workbench-panel" aria-labelledby="editor-heading">
+        <header class="workbench-header">
+          <div>
+            <p class="workbench-eyebrow">Seu programa</p>
+            <h2 id="editor-heading">Console Rust</h2>
+          </div>
+          <span class="key-hint">Ctrl / ⌘ + Enter executa</span>
+        </header>
         <CodeConsole
           :model-value="game.code"
           :disabled="game.phase === 'animating'"
@@ -27,15 +49,34 @@
           @run="onRun"
           @reset="onReset"
         />
-      </div>
 
-      <HintsPanel
-        :level="level"
-        :revealed-hints="game.revealedHints"
-        :example-shown="game.exampleShown"
-        @reveal="game.revealHint($event)"
-        @show-example="game.showExample()"
-      />
+        <InlineAlert v-if="game.emptyCode" class="empty-notice" tone="info">
+          Seu programa ainda não executou nenhum comando. Escreva uma instrução e tente novamente.
+        </InlineAlert>
+
+        <ErrorDisplay
+          :error="game.lastError"
+          :hint-visible="hintRevealed"
+          @use-hint="onUseHint"
+        />
+
+        <HintsPanel
+          :level="level"
+          :revealed-hints="game.revealedHints"
+          :example-shown="game.exampleShown"
+          @reveal="game.revealHint($event)"
+          @show-example="game.showExample()"
+        />
+      </section>
+
+      <section class="stage-panel" aria-label="Cena do jogo">
+        <header class="stage-header">
+          <span>Cena do nível</span>
+          <span class="stage-state">{{ stageStatus }}</span>
+        </header>
+        <GameCanvas :key="level.id" :map="level.map" />
+        <p class="sr-only" aria-live="polite">{{ sceneAnnouncement }}</p>
+      </section>
     </div>
 
     <NarrativeBanner
@@ -45,11 +86,17 @@
       :stars="starsNow"
       :hints-used="game.hintsUsed"
       :next-level-id="nextLevelId"
+      :sync-state="game.syncState"
       @retry="onRetry"
+      @retry-sync="game.retrySync()"
       @map="navigateTo('/mapa')"
       @next="onNext"
     />
-  </div>
+    </div>
+    <template #fallback>
+      <div class="level-loading" role="status" aria-live="polite">Preparando sua aventura…</div>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
@@ -69,6 +116,19 @@ const nextLevelId = computed(() => {
   return LEVELS[idx + 1]?.id ?? null
 })
 const starsNow = computed(() => game.computedStars())
+const mobilePane = ref<'code' | 'scene'>('code')
+const sceneAnnouncement = computed(() => {
+  if (game.phase === 'animating') return 'Seu programa está sendo executado na cena.'
+  if (game.phase === 'won') return 'Você chegou ao objetivo. Nível concluído.'
+  if (game.phase === 'lost') return 'A execução terminou sem completar o nível.'
+  return ''
+})
+const stageStatus = computed(() => ({
+  idle: 'Pronta',
+  animating: 'Executando',
+  won: 'Objetivo alcançado',
+  lost: 'Tente outra rota',
+}[game.phase]))
 
 const hintRevealed = ref(false)
 
@@ -80,6 +140,7 @@ watch(
       cancelPlayback()
       game.loadLevel(lvl)
       hintRevealed.value = false
+      mobilePane.value = 'code'
     }
     else {
       navigateTo('/mapa')
@@ -108,6 +169,7 @@ async function onRun() {
     && game.outcome
     && game.commands.length > 0
   ) {
+    mobilePane.value = 'scene'
     await playSequence(game.commands, game.outcome, () => game.finishAnimation())
   }
   else if (game.phase === 'animating') {
@@ -119,11 +181,13 @@ async function onRun() {
 async function onRetry() {
   await resetScene()
   game.backToIdle()
+  mobilePane.value = 'code'
 }
 
 async function onReset() {
   game.requestReset()
   await resetScene()
+  mobilePane.value = 'code'
 }
 
 function onUseHint() {
@@ -138,37 +202,141 @@ function onNext() {
 
 <style scoped>
 .level-page {
-  max-width: 1200px;
+  max-width: 1360px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 0.75rem;
 }
 
 .game-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 0.9rem;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 1rem;
   align-items: start;
 }
 
-.main-col {
+.level-narrative {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--accent);
+  background: linear-gradient(90deg, rgb(239 128 80 / 8%), transparent 72%);
+}
+
+.level-narrative p {
+  margin: 0;
+  color: var(--accent-2);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.narrative-mark { color: var(--gold); }
+
+.workbench-panel {
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.workbench-header,
+.stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.8rem;
+}
+
+.workbench-eyebrow {
+  margin: 0 0 0.2rem;
+  color: var(--accent-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.workbench-header h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.key-hint {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.empty-notice { font-size: 0.9rem; }
+
+.stage-panel {
   min-width: 0;
+  padding: 0.65rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-panel);
 }
 
-.empty-notice {
-  padding: 0.7rem 0.9rem;
-  color: var(--gold);
-  border-color: var(--gold);
-  font-size: 0.92rem;
+.stage-header {
+  padding: 0.1rem 0.2rem 0.65rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-@media (max-width: 960px) {
-  .game-grid {
-    grid-template-columns: 1fr;
+.stage-state {
+  color: var(--green);
+  font-size: 0.75rem;
+}
+
+.mobile-switch { display: none; }
+.level-loading { padding: 1.25rem 0; color: var(--text-dim); }
+
+@media (max-width: 900px) {
+  .mobile-switch {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
   }
+
+  .switch-button {
+    flex: 1;
+    min-height: 44px;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-dim);
+    font: inherit;
+    font-weight: 700;
+  }
+
+  .switch-button.selected {
+    background: var(--bg-elevated);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--border-bright);
+  }
+
+  .game-grid { grid-template-columns: minmax(0, 1fr); }
+  .mobile-pane-code .stage-panel,
+  .mobile-pane-scene .workbench-panel { display: none; }
+  .mobile-pane-scene .stage-panel { max-width: 900px; margin: 0 auto; width: 100%; }
+}
+
+@media (max-width: 520px) {
+  .level-page { gap: 0.6rem; }
+  .level-narrative { padding: 0.6rem 0.7rem; }
+  .level-narrative p { font-size: 0.85rem; }
+  .workbench-header { align-items: flex-start; }
+  .key-hint { max-width: 9rem; }
+  .stage-panel { padding: 0.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-button { transition: none; }
 }
 </style>

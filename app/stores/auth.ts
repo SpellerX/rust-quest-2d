@@ -41,12 +41,28 @@ export const useAuthStore = defineStore('auth', () => {
     setSession(res.token, res.user)
   }
 
-  async function register(email: string, username: string, password: string) {
-    const res = await $fetch<{ token: string; user: NonNullable<typeof user.value> }>('/api/auth/register', {
+  async function register(email: string, username: string, password: string): Promise<string> {
+    const res = await $fetch<{ token: string; recoveryCode: string; user: NonNullable<typeof user.value> }>('/api/auth/register', {
       method: 'POST',
       body: { email, username, password },
     })
     setSession(res.token, res.user)
+    return res.recoveryCode
+  }
+
+  async function forgotPassword(email: string, code: string, newPassword: string) {
+    await $fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      body: { email, code, newPassword },
+    })
+  }
+
+  async function changePassword(currentPassword: string, newPassword: string) {
+    await $fetch('/api/account/password', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: { currentPassword, newPassword },
+    })
   }
 
   function updateUser(patch: Partial<NonNullable<typeof user.value>>) {
@@ -72,6 +88,8 @@ export const useAuthStore = defineStore('auth', () => {
     hydrate,
     login,
     register,
+    forgotPassword,
+    changePassword,
     updateUser,
     logout,
   }

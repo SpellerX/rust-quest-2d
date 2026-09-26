@@ -1,9 +1,20 @@
 import { WORLD1_LEVELS } from './world1'
 import { WORLD2_LEVELS } from './world2'
+import { WORLD3_LEVELS } from './world3'
+import { WORLD4_LEVELS } from './world4'
+import { WORLD5_LEVELS } from './world5'
+import { WORLD6_LEVELS } from './world6'
 import type { Level } from './types'
 
 /** Sequência única de desbloqueio: mundos em ordem, níveis por `order`. */
-export const LEVELS: Level[] = [...WORLD1_LEVELS, ...WORLD2_LEVELS]
+export const LEVELS: Level[] = [
+  ...WORLD1_LEVELS,
+  ...WORLD2_LEVELS,
+  ...WORLD3_LEVELS,
+  ...WORLD4_LEVELS,
+  ...WORLD5_LEVELS,
+  ...WORLD6_LEVELS,
+]
 
 export function getLevel(id: string): Level | undefined {
   return LEVELS.find(l => l.id === id)

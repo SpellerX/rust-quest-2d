@@ -1,17 +1,17 @@
 <template>
-  <div v-if="error" class="error-card panel">
+  <InlineAlert v-if="error" class="error-card" tone="danger">
     <div class="error-head">
       <span class="error-code">{{ error.code }}</span>
       <span class="error-loc">linha {{ error.line }}, coluna {{ error.col }}</span>
     </div>
     <p class="error-friendly">{{ error.friendly }}</p>
     <div v-if="error.hint && !hintVisible" class="error-actions">
-      <button class="btn btn-gold" @click="$emit('use-hint')">
+      <button class="btn btn-gold" type="button" @click="$emit('use-hint')">
         💡 Ver dica (custa 1 estrela)
       </button>
     </div>
-    <p v-if="hintVisible" class="error-hint">💡 {{ error.hint }}</p>
-  </div>
+    <p v-if="hintVisible" class="error-hint" aria-live="polite">💡 {{ error.hint }}</p>
+  </InlineAlert>
 </template>
 
 <script setup lang="ts">
@@ -27,8 +27,7 @@ defineEmits<{ 'use-hint': [] }>()
 
 <style scoped>
 .error-card {
-  border-color: var(--red);
-  padding: 0.75rem 0.9rem;
+  border-left-color: var(--red);
 }
 
 .error-head {

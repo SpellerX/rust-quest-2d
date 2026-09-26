@@ -1,39 +1,48 @@
 <template>
-  <aside class="hints panel">
-    <h3 class="hints-title">💡 Dicas do nível</h3>
+  <aside class="hints panel" :aria-labelledby="`hints-title-${level.id}`">
+    <h3 :id="`hints-title-${level.id}`" class="hints-title">💡 Dicas do nível</h3>
 
     <!-- Dica 1 -->
     <div class="hint-block">
       <button
         class="btn hint-btn"
+        type="button"
         :disabled="revealedHints >= 1"
+        :aria-expanded="revealedHints >= 1"
+        :aria-controls="`hint-${level.id}-1`"
         @click="$emit('reveal', 0)"
       >
         <template v-if="revealedHints >= 1">✓ Dica 1 revelada</template>
         <template v-else>1ª dica (custa 1 estrela)</template>
       </button>
-      <p v-if="revealedHints >= 1" class="hint-text">{{ level.hints[0] }}</p>
+      <p v-if="revealedHints >= 1" :id="`hint-${level.id}-1`" class="hint-text" aria-live="polite">{{ level.hints[0] }}</p>
     </div>
 
     <!-- Dica 2 (só após a 1) -->
     <div class="hint-block">
       <button
         class="btn hint-btn"
+        type="button"
         :disabled="revealedHints < 1 || revealedHints >= 2"
+        :aria-expanded="revealedHints >= 2"
+        :aria-controls="`hint-${level.id}-2`"
         @click="$emit('reveal', 1)"
       >
         <template v-if="revealedHints >= 2">✓ Dica 2 revelada</template>
         <template v-else-if="revealedHints >= 1">2ª dica (custa 1 estrela)</template>
         <template v-else>2ª dica (trave a 1ª primeiro)</template>
       </button>
-      <p v-if="revealedHints >= 2" class="hint-text">{{ level.hints[1] }}</p>
+      <p v-if="revealedHints >= 2" :id="`hint-${level.id}-2`" class="hint-text" aria-live="polite">{{ level.hints[1] }}</p>
     </div>
 
     <!-- Exemplo (só após as 2 dicas) -->
     <div class="hint-block">
       <button
         class="btn btn-gold hint-btn"
+        type="button"
         :disabled="revealedHints < 2 || exampleShown"
+        :aria-expanded="exampleShown"
+        :aria-controls="`example-${level.id}`"
         @click="$emit('show-example')"
       >
         <template v-if="exampleShown">✓ Exemplo revelado</template>
@@ -41,8 +50,10 @@
         <template v-else>🔍 Exemplo (trave as 2 dicas primeiro)</template>
       </button>
       <template v-if="exampleShown">
-        <div class="example-label">Exemplo de solução:</div>
-        <pre class="code example-code">{{ level.solution }}</pre>
+        <div :id="`example-${level.id}`">
+          <div class="example-label">Exemplo de solução:</div>
+          <pre class="code example-code"><code>{{ level.solution }}</code></pre>
+        </div>
       </template>
     </div>
 

@@ -100,7 +100,8 @@ export function simulate(
     const steps: Array<{ x: number; y: number; k: CellKind }> = []
     trace.push(steps)
 
-    if (cmd.type === 'wait') continue
+    // wait e speak não movem o boneco (speak só pausa na animação).
+    if (cmd.type === 'wait' || cmd.type === 'speak') continue
 
     if (cmd.type === 'jump') {
       jumpTotal = Math.max(0, cmd.force)

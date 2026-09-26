@@ -6,18 +6,27 @@ import { LEVELS } from '../shared/levels'
 const VALID_CHARS = new Set(['.', '#', '^', 'o', 'G', 'P', 'V', 'E', ' '])
 
 /**
+ * Starters propositalmente quebrados: a lição É o erro mostrado.
+ * Cada entrada: id do nível → código de erro esperado.
+ */
+const BROKEN_STARTERS: Record<string, string> = {
+  'w1-l3': 'E0384',
+  'w6-l2': 'E0382',
+}
+
+/**
  * "CI do designer": nenhum nível pode ficar impossível, com mapa quebrado
  * ou voltar a ser fill-in-the-blank. Para cada nível:
  *  - mapa vertical válido (linhas de mesma largura, chars ok, 1 P, 1 G,
  *    chão sob o P, ≥ 8 linhas);
- *  - starter só-comentários (0 comandos executáveis) — exceto w1-l3, que
- *    deve falhar exatamente com E0384 (a lição do nível);
+ *  - starter só-comentários (0 comandos executáveis) — exceto os
+ *    BROKEN_STARTERS, que devem falhar exatamente com o erro da lição;
  *  - solution escrita do zero vence o mapa sob as regras do simulador.
  */
 describe('níveis', () => {
-  it('existem 10 níveis (mundos 1 e 2) com ids únicos', () => {
-    expect(LEVELS).toHaveLength(10)
-    expect(new Set(LEVELS.map(l => l.id)).size).toBe(10)
+  it('existem 30 níveis (mundos 1 a 6) com ids únicos', () => {
+    expect(LEVELS).toHaveLength(30)
+    expect(new Set(LEVELS.map(l => l.id)).size).toBe(30)
   })
 
   for (const level of LEVELS) {
@@ -39,10 +48,11 @@ describe('níveis', () => {
 
       it('starter exige que o jogador escreva (nada de fill-in)', () => {
         const run = execute(level.starterCode, { allowedFunctions: level.allowedFunctions })
-        if (level.id === 'w1-l3') {
-          // Código propositalmente quebrado: a lição é o E0384.
+        const brokenCode = BROKEN_STARTERS[level.id]
+        if (brokenCode) {
+          // Código propositalmente quebrado: a lição é o erro da tabela.
           expect(run.ok).toBe(false)
-          expect(run.error?.code).toBe('E0384')
+          expect(run.error?.code).toBe(brokenCode)
         }
         else {
           expect(run.ok, run.error?.friendly ?? '').toBe(true)
