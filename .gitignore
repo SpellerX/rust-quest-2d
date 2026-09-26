@@ -28,3 +28,5 @@ logs
 
 # Large reference documents
 *.pdf
+.vercel
+.env*
