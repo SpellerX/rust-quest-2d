@@ -6,15 +6,13 @@ import { connectDB } from '../../utils/db'
  * individual). `users: null` quando o banco não está acessível, para o
  * front simplesmente esconder o contador.
  */
-export default defineEventHandler(async (): Promise<{ users: number | null, error?: string }> => {
+export default defineEventHandler(async (): Promise<{ users: number | null }> => {
   try {
     await connectDB()
     const users = await User.countDocuments()
     return { users }
   }
-  catch (err) {
-    // TEMPORÁRIO: diagnóstico de conexão (remover após leitura)
-    const e = err as Error
-    return { users: null, error: `${e.name}: ${e.message}` }
+  catch {
+    return { users: null }
   }
 })
