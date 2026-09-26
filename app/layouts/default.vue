@@ -22,6 +22,20 @@
     <main id="main-content" class="content" tabindex="-1">
       <slot />
     </main>
+
+    <footer class="footer">
+      <nav class="footer-nav" aria-label="Links do rodapé">
+        <NuxtLink to="/">Início</NuxtLink>
+        <NuxtLink to="/mapa">Mapa dos 30 níveis</NuxtLink>
+        <NuxtLink to="/nivel/w1-l1">1º nível grátis</NuxtLink>
+        <NuxtLink to="/nivel/w1-l2">2º nível grátis</NuxtLink>
+        <NuxtLink to="/nivel/w1-l3">3º nível grátis</NuxtLink>
+        <NuxtLink to="/registro">Criar conta</NuxtLink>
+        <NuxtLink to="/login">Entrar</NuxtLink>
+        <a href="https://github.com/SpellerX/rust-quest-2d" rel="noopener">Código no GitHub</a>
+      </nav>
+      <p class="footer-note">Rust Quest 2D — jogo gratuito para aprender Rust do zero, no navegador.</p>
+    </footer>
   </div>
 </template>
 
@@ -136,6 +150,36 @@ onMounted(() => {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  padding: 1.4rem 1.4rem 1.8rem;
+  background: rgb(21 32 30 / 60%);
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.footer-nav a {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: var(--accent-2);
+}
+
+.footer-note {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.78rem;
 }
 
 @media (max-width: 600px) {

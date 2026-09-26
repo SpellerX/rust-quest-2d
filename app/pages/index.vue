@@ -19,7 +19,18 @@
           </NuxtLink>
         </div>
 
-        <p class="fineprint">Sem instalar nada · roda no navegador · progresso salvo</p>
+        <p v-if="!loggedIn" class="free-link-row">
+          <NuxtLink class="free-link" to="/nivel/w1-l1">
+            ▶ Jogar o 1º nível sem cadastro →
+          </NuxtLink>
+        </p>
+
+        <p class="fineprint">
+          Sem instalar nada · roda no navegador · progresso salvo
+          <template v-if="studentCount !== null">
+            · <strong class="students-count">{{ studentCount.toLocaleString('pt-BR') }}</strong> alunos já criaram conta
+          </template>
+        </p>
       </div>
 
       <div class="hero-code panel" aria-hidden="true">
@@ -54,6 +65,14 @@
         <span>E0382 e companhia em português, com dica na hora</span>
       </div>
     </section>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Perguntas frequentes sobre aprender Rust</h2>
+      <details v-for="item in faq" :key="item.q" class="faq-item">
+        <summary>{{ item.q }}</summary>
+        <p>{{ item.a }}</p>
+      </details>
+    </section>
   </div>
 </template>
 
@@ -61,16 +80,101 @@
 const auth = useAuthStore()
 
 const loggedIn = ref(false)
+const studentCount = ref<number | null>(null)
 
-onMounted(() => {
+onMounted(async () => {
   auth.hydrate()
   loggedIn.value = auth.isAuthenticated
+  try {
+    const res = await $fetch<{ users: number | null }>('/api/stats/users')
+    studentCount.value = res.users
+  }
+  catch {
+    // sem rede/sem banco: contador simplesmente não aparece
+  }
 })
 
 const ctaTarget = computed(() => (loggedIn.value ? '/mapa' : '/registro'))
 const ctaLabel = computed(() => (loggedIn.value ? '▶ Continuar aventura' : '▶ Jogar agora'))
 
-useHead({ title: 'Rust Quest 2D — Aprenda Rust jogando' })
+const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
+const DESCRIPTION
+  = 'Jogo grátis para aprender Rust no navegador: 30 níveis do let ao ownership, com dicas, erros em português e estrelas. Os 3 primeiros níveis são sem cadastro.'
+
+const faq = [
+  {
+    q: 'O que é o Rust Quest 2D?',
+    a: 'É um jogo educativo em que você escreve código Rust de verdade num console e o personagem pixel executa seus comandos em uma plataforma 2D vertical. Serve de tutorial e de prática para quem está aprendendo Rust do zero.',
+  },
+  {
+    q: 'Preciso instalar o Rust ou alguma ferramenta?',
+    a: 'Não. Tudo roda direto no navegador: o interpretador do jogo é nosso e entende um subconjunto do Rust, do let até ownership. Basta abrir a página e começar a jogar.',
+  },
+  {
+    q: 'O Rust Quest 2D é grátis?',
+    a: 'Sim. Os 3 primeiros níveis são jogáveis sem cadastro. Criar conta é gratuito e serve para salvar progresso, estrelas e XP entre dispositivos.',
+  },
+  {
+    q: 'Preciso saber programar para jogar?',
+    a: 'Não. O jogo ensina os conceitos na ordem — cada nível tem um card "O que você vai aprender", dicas progressivas e mensagens de erro em português. Quem nunca programou consegue acompanhar desde o nível 1.',
+  },
+  {
+    q: 'Que tópicos de Rust o jogo ensina?',
+    a: 'A progressão segue o livro oficial The Rust Programming Language: variáveis com let e mut, operadores, laços (for, while, loop), funções, String, e ownership com move e empréstimo (&), incluindo o erro clássico E0382.',
+  },
+  {
+    q: 'Funciona no celular?',
+    a: 'Os mapas e níveis têm layout adaptado para telas menores, com alternância entre o console de código e a cena do jogo. Para digitar código, um teclado físico ajuda, mas é jogável no navegador do celular.',
+  },
+]
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map(item => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+}
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Rust Quest 2D',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web',
+  inLanguage: 'pt-BR',
+  url: SITE_URL,
+  description: DESCRIPTION,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'BRL' },
+  genre: 'Educativo',
+  keywords: 'aprender rust, rust para iniciantes, tutorial rust, jogo educativo rust, programação rust',
+}
+
+useSeoMeta({
+  title: 'Rust Quest 2D — Aprenda Rust jogando grátis no navegador',
+  description: DESCRIPTION,
+  ogTitle: 'Rust Quest 2D — Aprenda Rust jogando',
+  ogDescription: DESCRIPTION,
+  ogUrl: `${SITE_URL}/`,
+  ogImage: `${SITE_URL}/og.png`,
+  ogType: 'website',
+  ogLocale: 'pt_BR',
+  ogSiteName: 'Rust Quest 2D',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Rust Quest 2D — Aprenda Rust jogando',
+  twitterDescription: DESCRIPTION,
+  twitterImage: `${SITE_URL}/og.png`,
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: `${SITE_URL}/` }],
+  script: [
+    { type: 'application/ld+json', innerHTML: JSON.stringify(softwareJsonLd) },
+    { type: 'application/ld+json', innerHTML: JSON.stringify(faqJsonLd) },
+  ],
+})
 </script>
 
 <style scoped>
@@ -154,6 +258,58 @@ a.btn:hover {
   color: var(--text-dim);
   font-size: 0.82rem;
   margin: 1rem 0 0;
+}
+
+.students-count {
+  color: var(--accent-2);
+}
+
+.free-link-row {
+  margin: 0.9rem 0 0;
+}
+
+.free-link {
+  color: var(--accent-2);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-bottom: 1px dashed rgb(239 128 80 / 50%);
+}
+
+.free-link:hover {
+  border-bottom-style: solid;
+}
+
+/* FAQ — conteúdo indexável para caudas de busca ("aprender rust", etc.) */
+.faq {
+  border-top: 1px solid var(--border);
+  padding-top: 1.6rem;
+}
+
+.faq h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.faq-item {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.faq-item p {
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin: 0.7rem 0 0.1rem;
+  max-width: 46rem;
 }
 
 /* Painel de código: mesma linguagem do editor do jogo */

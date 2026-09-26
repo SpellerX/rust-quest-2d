@@ -74,6 +74,11 @@ async function onSubmit() {
     busy.value = false
   }
 }
+
+useSeoMeta({
+  title: 'Trocar senha — Rust Quest 2D',
+  robots: 'noindex, follow',
+})
 </script>
 
 <style scoped>

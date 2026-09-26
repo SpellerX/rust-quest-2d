@@ -16,6 +16,13 @@ export const LEVELS: Level[] = [
   ...WORLD6_LEVELS,
 ]
 
+/** Níveis jogáveis sem conta — 3 primeiros da sequência. */
+export const FREE_LEVEL_IDS: string[] = ['w1-l1', 'w1-l2', 'w1-l3']
+
+export function isFreeLevel(id: string): boolean {
+  return FREE_LEVEL_IDS.includes(id)
+}
+
 export function getLevel(id: string): Level | undefined {
   return LEVELS.find(l => l.id === id)
 }

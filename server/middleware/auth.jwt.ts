@@ -1,6 +1,6 @@
 import { verifyToken } from '../utils/jwt'
 
-const PUBLIC_PREFIXES = ['/api/auth/', '/api/levels']
+const PUBLIC_PREFIXES = ['/api/auth/', '/api/levels', '/api/stats/']
 
 /**
  * Valida o header Authorization: Bearer <jwt> em todas as rotas /api

@@ -1,5 +1,4 @@
 <template>
-  <ClientOnly>
     <div class="map-page">
     <header class="map-header">
       <div class="map-heading">
@@ -9,9 +8,14 @@
       </div>
       <div class="header-stats" role="group" aria-label="Seu progresso">
         <div class="stat"><span aria-hidden="true">⭐</span><strong>{{ progress.totalStars }}</strong><span>estrelas</span></div>
-        <div class="stat"><span aria-hidden="true">⚡</span><strong>{{ auth.user?.xp ?? progress.xp }}</strong><span>XP</span></div>
+        <div class="stat"><span aria-hidden="true">⚡</span><strong>{{ sessionReady ? (auth.user?.xp ?? progress.xp) : 0 }}</strong><span>XP</span></div>
       </div>
     </header>
+
+    <InlineAlert v-if="sessionReady && !auth.isAuthenticated" class="progress-alert" tone="info">
+      <span>Você está jogando como visitante: os 3 primeiros níveis são livres. Crie uma conta grátis para liberar os 30 níveis e salvar progresso.</span>
+      <NuxtLink class="btn btn-sm" to="/registro">Criar conta grátis</NuxtLink>
+    </InlineAlert>
 
     <InlineAlert v-if="progressError" class="progress-alert" tone="warning">
       <span>Não foi possível sincronizar seu progresso. Este mapa pode estar desatualizado.</span>
@@ -70,7 +74,7 @@
         <div class="cards">
           <template v-for="level in world.levels" :key="level.id">
             <NuxtLink
-              v-if="progress.isUnlocked(level.id)"
+              v-if="progress.isUnlocked(level.id) || !sessionReady || !auth.isAuthenticated"
               class="level-card panel"
               :class="{
                 'level-card--completed': progress.isCompleted(level.id),
@@ -90,6 +94,7 @@
               <div class="card-state">
                 <template v-if="progress.isCompleted(level.id)"><span aria-hidden="true">✓</span> Concluído</template>
                 <template v-else-if="recommendedLevel?.id === level.id"><span aria-hidden="true">▶</span> Próximo recomendado</template>
+                <template v-else-if="sessionReady && !auth.isAuthenticated && !isFreeLevel(level.id)"><span aria-hidden="true">🔒</span> Cadastre-se para jogar</template>
                 <template v-else>Disponível</template>
               </div>
             </NuxtLink>
@@ -107,25 +112,21 @@
       </section>
     </template>
     </div>
-    <template #fallback>
-      <div class="map-loading" role="status" aria-live="polite">Verificando sua sessão…</div>
-    </template>
-  </ClientOnly>
 </template>
 
 <script setup lang="ts">
-import { LEVELS } from '#shared/levels'
+import { isFreeLevel, LEVELS } from '#shared/levels'
 import { WORLD3_CONCEPTS } from '#shared/levels/world3'
 import { WORLD4_CONCEPTS } from '#shared/levels/world4'
 import { WORLD5_CONCEPTS } from '#shared/levels/world5'
 import { WORLD6_CONCEPTS } from '#shared/levels/world6'
 
-definePageMeta({ middleware: 'auth' })
-
 const progress = useProgressStore()
 const auth = useAuthStore()
 const loading = ref(false)
 const progressError = ref(false)
+/** Evita divergência de hidratação: SSR não sabe a sessão do visitante. */
+const sessionReady = ref(false)
 
 const WORLD_NAMES: Record<number, string> = {
   1: 'Vila das Variáveis',
@@ -189,7 +190,29 @@ async function loadProgress() {
 }
 
 onMounted(() => {
+  sessionReady.value = true
   if (auth.isAuthenticated) void loadProgress()
+})
+
+const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
+const DESCRIPTION
+  = 'Mapa dos 30 níveis do Rust Quest 2D: 6 mundos que ensinam Rust do let ao ownership — Vila das Variáveis até as Ruínas da Posse. Os 3 primeiros níveis são grátis sem cadastro.'
+
+useSeoMeta({
+  title: 'Mapa dos níveis — aprenda Rust em 6 mundos | Rust Quest 2D',
+  description: DESCRIPTION,
+  ogTitle: 'Mapa da aventura — Rust Quest 2D',
+  ogDescription: DESCRIPTION,
+  ogUrl: `${SITE_URL}/mapa`,
+  ogImage: `${SITE_URL}/og.png`,
+  ogType: 'website',
+  ogLocale: 'pt_BR',
+  ogSiteName: 'Rust Quest 2D',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: `${SITE_URL}/mapa` }],
 })
 </script>
 

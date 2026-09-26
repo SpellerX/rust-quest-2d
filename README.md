@@ -1,8 +1,14 @@
 # 🦀 Rust Quest 2D
 
-Plataforma gamificada de ensino de Rust para iniciantes: um jogo de
-plataforma 2D **vertical** onde você **escreve código Rust do zero** num
-console e o boneco pixel-art executa os comandos gerados pelo seu código.
+**[▶ Jogar grátis no navegador](https://rust-quest-2d-one.vercel.app)** ·
+os 3 primeiros níveis não pedem cadastro.
+
+Jogo e tutorial grátis para **aprender Rust do zero**: um RPG pixel de
+plataforma 2D **vertical** onde você **escreve código Rust de verdade** num
+console e o boneco executa. Feito para quem está começando em Rust
+(`let`, variáveis, laços, funções e ownership) — em português, sem
+instalar nada, seguindo a progressão do livro oficial *The Rust
+Programming Language*.
 
 > Escopo atual: **Mundos 1–6 (30 níveis)** com pedagogia completa —
 > card *"O que você vai aprender"*, dicas progressivas por nível e
@@ -75,7 +81,8 @@ NUXT_JWT_SECRET=<segredo de 32+ caracteres>
 NUXT_MONGODB_URI=<connection string do Atlas, com /rustquest antes do ?>
 ```
 
-O acesso ao mapa e aos níveis exige uma conta autenticada, e o progresso é
+Os **3 primeiros níveis** e o mapa são públicos (modo visitante); para
+seguir nos demais 27 níveis é preciso uma conta gratuita — o progresso é
 salvo no MongoDB. Sem `NUXT_MONGODB_URI`, cadastro, login e sincronização de
 progresso não estarão disponíveis (as rotas retornam `503`). A execução do
 código acontece no navegador, mas o produto **não oferece um modo offline

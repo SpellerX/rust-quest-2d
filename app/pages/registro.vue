@@ -47,7 +47,7 @@
         Mostramos o código só agora e não será possível vê-lo de novo. Anote antes de continuar.
       </InlineAlert>
 
-      <button class="btn btn-primary auth-submit" type="button" @click="navigateTo('/mapa')">
+      <button class="btn btn-primary auth-submit" type="button" @click="navigateTo(startTarget)">
         ▶ Começar a jogar
       </button>
     </section>
@@ -56,6 +56,9 @@
 
 <script setup lang="ts">
 const auth = useAuthStore()
+const route = useRoute()
+
+const startTarget = computed(() => String(route.query.redirect ?? '/mapa'))
 
 const username = ref('')
 const email = ref('')
@@ -88,6 +91,18 @@ async function copyCode() {
     copied.value = false
   }
 }
+
+useSeoMeta({
+  title: 'Criar conta grátis — aprenda Rust | Rust Quest 2D',
+  description: 'Crie sua conta gratuita e desbloqueie os 30 níveis do Rust Quest 2D. Salve estrelas, XP e progresso — sem instalar nada.',
+  ogTitle: 'Criar conta grátis — Rust Quest 2D',
+  ogUrl: 'https://rust-quest-2d-one.vercel.app/registro',
+  ogImage: 'https://rust-quest-2d-one.vercel.app/og.png',
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: 'https://rust-quest-2d-one.vercel.app/registro' }],
+})
 </script>
 
 <style scoped>
