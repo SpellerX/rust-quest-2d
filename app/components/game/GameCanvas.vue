@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import type { HeroState } from './textures'
-import { createHeroTexture, createNpcTexture } from './textures'
+import { S, SPIKE_FRAME, TILE_FRAME, createGameAnims, loadGameAssets } from './assets'
 
 const props = defineProps<{ map: string[] }>()
 
@@ -19,7 +19,8 @@ interface GameLike {
 
 const VIEW_W = 900
 const VIEW_H = 600
-const TILE = 48
+// 64 = 4 × o tile de 16px do pacote; mantém toda a escala inteira.
+const TILE = 64
 
 const host = ref<HTMLDivElement | null>(null)
 let game: GameLike | null = null
@@ -51,10 +52,12 @@ onMounted(async () => {
       super('level')
     }
 
+    preload() {
+      loadGameAssets(this)
+    }
+
     create() {
-      createHeroTexture(this)
-      createNpcTexture(this, 'guard')
-      createNpcTexture(this, 'engineer')
+      createGameAnims(this)
 
       this.drawBackground()
       this.drawTiles()
@@ -73,8 +76,9 @@ onMounted(async () => {
       }
       this.startX = px
       this.startY = py
-      this.player = this.add.sprite(cellCX(px), cellBottom(py), 'hero', 0)
+      this.player = this.add.sprite(cellCX(px), cellBottom(py), 'hero-idle', 0)
       this.player.setOrigin(0.5, 1)
+      this.player.setScale(S.hero)
       this.player.setDepth(10)
       if (reducedMotion) this.player.setFrame(0)
       else this.player.play('hero-idle')
@@ -120,7 +124,7 @@ onMounted(async () => {
           await this.tween({
             targets: this.player,
             alpha: 0.35,
-            y: this.player.y + 24,
+            y: this.player.y + TILE / 2,
             duration: 320,
             ease: 'Quad.easeIn',
           })
@@ -187,66 +191,65 @@ onMounted(async () => {
     }
 
     private drawTiles() {
-      const gfx = this.add.graphics().setDepth(0).setPosition(OX, OY)
+      const ground = (x: number, y: number, frame: string) =>
+        this.add
+          .image(OX + x * TILE, OY + y * TILE, 'tileset', frame)
+          .setOrigin(0, 0)
+          .setScale(S.tile)
+          .setDepth(0)
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const ch = cellAt(x, y)
-          const px = x * TILE
-          const py = y * TILE
 
           if (ch === '#') {
-            const isBedrock = y === rows - 1
-            gfx.fillStyle(isBedrock ? 0x4a2f1a : 0x6b4423, 1)
-            gfx.fillRect(px, py, TILE, TILE)
-            // Grama no topo exposto
-            if (cellAt(x, y - 1) !== '#') {
-              gfx.fillStyle(0x3fa34d, 1)
-              gfx.fillRect(px, py, TILE, 9)
-              gfx.fillStyle(0x2e7d3a, 1)
-              gfx.fillRect(px, py + 9, TILE, 3)
-            }
-            gfx.lineStyle(2, 0x3f2a18, 0.6)
-            gfx.strokeRect(px, py, TILE, TILE)
+            const frame =
+              cellAt(x, y - 1) !== '#' ? TILE_FRAME.top
+                : y === rows - 1 ? TILE_FRAME.bedrock
+                : TILE_FRAME.fill
+            ground(x, y, frame)
           }
           else if (ch === '^') {
-            gfx.fillStyle(0xef476f, 1)
-            gfx.fillTriangle(
-              px + TILE / 2, py + 6,
-              px + 10, py + TILE - 4,
-              px + TILE - 10, py + TILE - 4,
-            )
-            gfx.fillStyle(0xb83254, 1)
-            gfx.fillRect(px + 10, py + TILE - 6, TILE - 20, 4)
+            // Estático de propósito: a animação do pacote faz os espinhos
+            // regridem, e sugeriria "área segura" num perigo sempre fatal.
+            this.add
+              .sprite(cellCX(x), cellBottom(y), 'spike', SPIKE_FRAME)
+              .setOrigin(0.5, 1)
+              .setScale(S.spike)
+              .setDepth(6)
           }
           else if (ch === 'G') {
-            gfx.fillStyle(0x0b3d33, 1)
-            gfx.fillRect(px + 8, py + 4, TILE - 16, TILE - 4)
-            gfx.fillStyle(0x06d6a0, 1)
-            gfx.fillRoundedRect(px + 11, py + 7, TILE - 22, TILE - 7, { tl: 12, tr: 12, bl: 0, br: 0 })
-            gfx.fillStyle(0xffd166, 1)
-            gfx.fillCircle(px + TILE - 20, py + TILE / 2 + 6, 4)
+            const goal = this.add
+              .sprite(cellCX(x), cellBottom(y), 'goal', 0)
+              .setOrigin(0.5, 1)
+              .setScale(S.goal)
+              .setDepth(3)
+            if (!reducedMotion) goal.play('goal-glow')
           }
         }
       }
 
-      // Moedas: leve flutuação animada
+      // Gemas: rotação contínua + leve flutuação
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          if (cellAt(x, y) === 'o') {
-            const coin = this.add.circle(cellCX(x), cellBottom(y) - TILE / 2, TILE * 0.26, 0xffd166)
-            coin.setDepth(4)
-            if (!reducedMotion) {
-              this.tweens.add({
-                targets: coin,
-                y: coin.y - 7,
-                duration: 900,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut',
-              })
-            }
+          if (cellAt(x, y) !== 'o') continue
+
+          const gem = this.add.sprite(cellCX(x), cellBottom(y) - TILE / 2, 'gem', 0)
+          gem.setScale(S.gem)
+          gem.setDepth(4)
+          if (reducedMotion) {
+            gem.setFrame(0)
+            continue
           }
+          gem.play('gem-spin')
+          this.tweens.add({
+            targets: gem,
+            y: gem.y - TILE / 8,
+            duration: 900,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          })
         }
       }
     }
@@ -260,6 +263,7 @@ onMounted(async () => {
             const kind = ch === 'V' ? 'guard' : 'engineer'
             const npc = this.add.sprite(cellCX(x), cellBottom(y), kind, 0)
             npc.setOrigin(0.5, 1)
+            npc.setScale(S.npc)
             npc.setDepth(5)
             if (reducedMotion) npc.setFrame(0)
             else npc.play(`${kind}-idle`)
