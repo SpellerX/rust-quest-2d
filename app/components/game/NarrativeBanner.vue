@@ -32,6 +32,14 @@
           <ul class="bullets">
             <li v-for="(bullet, index) in level.learnAfter.bullets" :key="index">{{ bullet }}</li>
           </ul>
+          <NuxtLink
+            v-if="capituloSlug"
+            class="btn learn-link"
+            :to="`/biblioteca/${capituloSlug}`"
+            :aria-label="`Entenda melhor: ${level.learnAfter.title}`"
+          >
+            📖 Entenda melhor
+          </NuxtLink>
         </div>
         <p v-if="hintsUsed > 0" class="hint-cost">
           Você usou {{ hintsUsed }} dica(s) — tente sem elas na próxima!
@@ -96,6 +104,7 @@
 import type { Level } from '#shared/levels/types'
 import type { Outcome } from '#shared/types'
 import type { GamePhase, ProgressSyncState } from '../../stores/game'
+import { slugDoNivel } from '#shared/biblioteca'
 
 const props = defineProps<{
   level: Level
@@ -122,6 +131,7 @@ const isIntro = computed(() => !dismissed.value && props.phase === 'idle')
 const visible = computed(() => isIntro.value || props.phase === 'won' || props.phase === 'lost')
 const isDeath = computed(() => props.outcome?.result === 'death')
 const cause = computed(() => props.outcome?.cause ?? 'pit')
+const capituloSlug = computed(() => slugDoNivel(props.level.id))
 
 watch(visible, async (open) => {
   if (!import.meta.client) return
@@ -251,6 +261,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onDialogKeydown))
 }
 
 .learn h3 { margin: 0 0 0.4rem; color: var(--green); font-size: 1rem; }
+
+/* Ação secundária: a primária da região é "Próximo nível" (design-system §54). */
+.learn-link {
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+}
+
 .hint-cost { color: var(--gold); font-size: 0.9rem; }
 .sync-alert { margin-top: 0.9rem; text-align: left; }
 .sync-retry { margin-top: 0.55rem; }

@@ -1,3 +1,4 @@
+import { CAPITULOS } from '#shared/biblioteca'
 import { LEVELS } from '#shared/levels'
 
 const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
@@ -5,6 +6,7 @@ const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
 const STATIC_ROUTES: string[] = [
   '/',
   '/mapa',
+  '/biblioteca',
   '/login',
   '/registro',
 ]
@@ -14,6 +16,7 @@ export default defineEventHandler((event) => {
   const urls = [
     ...STATIC_ROUTES,
     ...LEVELS.map(l => `/nivel/${l.id}`),
+    ...CAPITULOS.map(c => `/biblioteca/${c.slug}`),
   ]
 
   const body = urls.map(path =>

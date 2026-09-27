@@ -7,6 +7,7 @@
       </NuxtLink>
       <div class="spacer" />
       <nav class="nav" aria-label="Navegação principal">
+        <NuxtLink to="/biblioteca" class="nav-link"><span aria-hidden="true">📖</span> Biblioteca</NuxtLink>
         <template v-if="loggedIn">
           <NuxtLink to="/mapa" class="nav-link"><span aria-hidden="true">🗺️</span> Mapa</NuxtLink>
           <NuxtLink to="/trocar-senha" class="nav-link">Trocar senha</NuxtLink>
@@ -27,6 +28,7 @@
       <nav class="footer-nav" aria-label="Links do rodapé">
         <NuxtLink to="/">Início</NuxtLink>
         <NuxtLink to="/mapa">Mapa dos 30 níveis</NuxtLink>
+        <NuxtLink to="/biblioteca">Biblioteca do Aventureiro</NuxtLink>
         <NuxtLink to="/nivel/w1-l1">1º nível grátis</NuxtLink>
         <NuxtLink to="/nivel/w1-l2">2º nível grátis</NuxtLink>
         <NuxtLink to="/nivel/w1-l3">3º nível grátis</NuxtLink>

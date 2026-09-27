@@ -76,6 +76,33 @@ Bloco dentro do banner de vitória (`NarrativeBanner.vue`), entre os alertas de 
 - **Estados**: desabilitado sem nota → `aria-busy` ao enviar → sucesso em `role="status"` com "Alterar avaliação" → erro via `InlineAlert` (`warning` para 503 sem banco, `danger` nos demais). A falha nunca bloqueia a vitória.
 - **Acessibilidade**: grupos em `<fieldset>`/`<legend>`; o foco dourado de 3 px é transferido do input oculto ao label vizinho (`input:focus-visible + label`); alvos de 44 px nas estrelas e nos botões.
 
+### Biblioteca do Aventureiro (prateleira de capítulos)
+
+Índice `/biblioteca` e página de capítulo `/biblioteca/[slug]`. O índice é uma **prateleira**:
+uma estante por **mundo**, um **livrinho** por capítulo (`app/components/LibraryBook.vue`).
+Não é modal, tabela ou tab — é navegação, e cada livro é um `NuxtLink`.
+
+- **Hierarquia:** prateleira = mundo (6) · livrinho = capítulo (20). Os capítulos cobrem os 30
+  níveis; a chave nível → capítulo fica em `shared/biblioteca/index.ts` (`slugDoNivel`), nunca
+  duplicada dentro dos componentes.
+- **Lombada:** fundo escuro (`--bg-elevated`/`--bg-panel`) com texto `--text`, e faixas na cor
+  do `passo` (`[data-passo]` → `--cor-passo`). **Nunca** hex novo: só tokens de `:root`.
+  A cor reforça a trilha, mas o passo também aparece escrito no índice — a cor nunca é o único sinal.
+- **Praticado:** `✓` na lombada (desktop) e o texto `✓ Praticado` na capa (≤ 640 px), além do
+  `aria-label`. Símbolo + texto, nunca só cor.
+- **Hover:** o livro sai da prateleira (`translateY(-7px)`), desligado em `prefers-reduced-motion`.
+- **Responsivo:** ≥ 720 px livros de pé com lombada vertical sobre a régua; ≤ 640 px a grade vira
+  **capas horizontais** (a lombada vertical fica ilegível e causa overflow). A régua some no mobile.
+- **Página do capítulo:** "livro aberto" com largura de leitura limitada e borda esquerda na cor
+  do `passo`, fechando o ciclo visual com a prateleira. Blocos fixos: *O que você fez* → seções →
+  *Pegadinhas* → *Pratique neste nível* → *No livro oficial*.
+- **Botão na vitória:** dentro de `.learn`, como `.btn` **secundário** (`📖 Entenda melhor`) — a
+  ação primária da região continua sendo "Próximo nível". Some se o nível não tiver capítulo.
+- **Conteúdo:** vive em `shared/biblioteca/capitulos.ts` (TypeScript, sem pipeline de markdown).
+  Regras de redação: PT-BR simples, **termos técnicos em inglês** (`ownership`, `borrowing`,
+  `slice`) com glosa só quando ajudar, e nada que repita `learnAfter`/`cheatSheet`
+  (garantido por `tests/biblioteca.test.ts`).
+
 ## Layout e responsividade
 
 - Páginas de exploração e conteúdo usam largura limitada e leitura escaneável; a bancada de jogo pode ocupar mais espaço para editor e cena.

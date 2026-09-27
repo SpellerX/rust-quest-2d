@@ -26,6 +26,11 @@ Programming Language*.
 - **Pedagogia completa por nível**: conceito antes, dicas em cascata
   (dica 1 → dica 2 → exemplo, cada uma custa 1 estrela) e resumo do
   aprendizado na vitória.
+- **Biblioteca do Aventureiro** (`/biblioteca`): 20 capítulos teóricos em
+  português, desenhados como livrinhos numa prateleira por mundo. A vitória
+  de cada nível traz um botão **📖 Entenda melhor** que leva ao capítulo do
+  conceito praticado, com código Rust real e link para o capítulo do livro
+  oficial correspondente.
 - **Plataforma vertical de verdade**: simulador com arco de pulo
   (`h(k)=min(k, f−k)`), queda entre plataformas, subida de degraus e
   morte só no fundo do mapa/espinho — cliente e servidor rodam o MESMO
@@ -43,7 +48,7 @@ Programming Language*.
   checker → executor, usado **tanto pelo navegador quanto pelo servidor**;
   subconjunto do Rust com `if`/`else`, laços, `fn` do jogador e
   ownership de `String` (move/`&`, erro E0382)
-- **Vitest** — 318 testes (interpretador, simulador vertical, níveis)
+- **Vitest** — 336 testes (interpretador, simulador vertical, níveis, biblioteca)
 
 ## Interface e Design System
 
@@ -59,9 +64,11 @@ simulador já validou.
 ```
 app/           páginas, componentes (GameCanvas, CodeConsole…), stores Pinia
 app/components/game/textures.ts   pixel-art procedural do herói e NPCs
+app/pages/biblioteca/             prateleira + página de capítulo da Biblioteca
 shared/        interpretador, simulador vertical, níveis  ← client e server
+shared/biblioteca/                tipos + os 20 capítulos teóricos
 server/        rotas Nitro (auth, levels, progress, attempts), models
-tests/         Vitest (318 testes)
+tests/         Vitest (336 testes)
 ```
 
 ## Como rodar
@@ -93,7 +100,7 @@ completo**.
 | Comando | O que faz |
 |---|---|
 | `npm run dev` | servidor de desenvolvimento |
-| `npm test` | 318 testes (interpretador, simulador, níveis) |
+| `npm test` | 336 testes (interpretador, simulador, níveis, biblioteca) |
 | `npm run typecheck` | TypeScript estrito (vue-tsc) |
 
 ## Conceito do jogo (MVP)
@@ -106,6 +113,7 @@ completo**.
 4. Erros em português amigável (`E0412` → "Você criou ela com `let`?").
 5. Dicas em cascata (dica 1 → 2 → exemplo), cada uma −1★.
 6. Vitória com **"Você aprendeu"** (resumo do conceito) + estrelas/XP.
+7. Botão **📖 Entenda melhor** → capítulo da Biblioteca do Aventureiro.
 
 ### API de jogo (único "runtime" que o código do jogador pode chamar)
 
@@ -140,7 +148,8 @@ qualquer altura vence. Vitória é decidida **sempre** pelo simulador
 
 - **Feito**: Mundos 1–6 completos com pedagogia (30 níveis), plataforma
   vertical, pixel-art, auth + progresso no Atlas, interpretador com
-  if/laços/fn/ownership básico.
+  if/laços/fn/ownership básico, e a **Biblioteca do Aventureiro**
+  (20 capítulos teóricos ligados à tela de vitória).
 - **Próxima fase**: Mundos 7–12 (structs/enums, coleções, erros,
   traits/generics).
 - **Depois**: avaliar sandbox real para borrow checker completo.
