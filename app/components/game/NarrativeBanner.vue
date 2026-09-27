@@ -53,6 +53,8 @@
           </button>
         </InlineAlert>
 
+        <FeedbackForm :level-id="level.id" :sync-state="syncState" />
+
         <div class="banner-actions">
           <button class="btn" type="button" @click="$emit('retry')">↺ Repetir</button>
           <button class="btn" type="button" @click="$emit('map')">Mapa</button>

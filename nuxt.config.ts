@@ -21,9 +21,10 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    // NUXT_JWT_SECRET / NUXT_MONGODB_URI via .env
+    // NUXT_JWT_SECRET / NUXT_MONGODB_URI / NUXT_ADMIN_EMAILS via .env
     // (camelCase → SNAKE_CASE: mongodbUri casa com NUXT_MONGODB_URI)
     jwtSecret: '',
     mongodbUri: '',
+    adminEmails: '',
   },
 })

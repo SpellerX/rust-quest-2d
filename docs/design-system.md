@@ -66,6 +66,16 @@ Estados interativos devem cobrir padrão, hover, foco, ativo, desabilitado, carr
 
 Não crie tabelas, dropdowns, tabs, modais ou toasts sem uma necessidade real do fluxo. Quando um padrão novo se tornar necessário, documente-o aqui e implemente-o de forma reutilizável.
 
+### Formulário de avaliação (`FeedbackForm.vue`)
+
+Bloco dentro do banner de vitória (`NarrativeBanner.vue`), entre os alertas de sincronização e as ações. Não é modal: usa o overlay já existente.
+
+- **Quem vê**: apenas `auth.isAuthenticated` **e** `syncState === 'saved'`. Visitantes dos níveis livres não recebem o formulário — assim evitamos spam e garantimos que o servidor já gravou o progresso.
+- **Notação de estrelas, não troque**: `⭐` = estrelas *ganhas* da tentativa (máximo 3, custo de dicas); `★` = **nota do desafio** de 1 a 5. Rótulos sempre "Nota do desafio" / "Avaliação", nunca "estrelas" sozinho.
+- **Campos**: nota (5 radios ocultos + `<label>★</label>`), "Você gostou do desafio?" (radios Sim/Não), comentário opcional (`textarea`, `maxlength` 500).
+- **Estados**: desabilitado sem nota → `aria-busy` ao enviar → sucesso em `role="status"` com "Alterar avaliação" → erro via `InlineAlert` (`warning` para 503 sem banco, `danger` nos demais). A falha nunca bloqueia a vitória.
+- **Acessibilidade**: grupos em `<fieldset>`/`<legend>`; o foco dourado de 3 px é transferido do input oculto ao label vizinho (`input:focus-visible + label`); alvos de 44 px nas estrelas e nos botões.
+
 ## Layout e responsividade
 
 - Páginas de exploração e conteúdo usam largura limitada e leitura escaneável; a bancada de jogo pode ocupar mais espaço para editor e cena.
