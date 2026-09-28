@@ -4,7 +4,7 @@
  *
  * Carregar no `preload()` da cena Phaser (`loadGameAssets`) e registrar as
  * animações no `create()` (`createGameAnims`). Os tamanhos de frame vêm do
- * pacote: herói 32×32, NPCs e espinhos 48×48, gemas 16×16, troféu 64×64 e
+ * pacote: herói 32×32, NPCs e espinhos 48×48, gemas 16×16, portão 64×64 e
  * tileset 16×16 — todos com escala inteira na malha do mundo (TILE = 64).
  */
 

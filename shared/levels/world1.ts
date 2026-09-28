@@ -76,7 +76,7 @@ export const WORLD1_LEVELS: Level[] = [
     ],
     success: { type: 'reach_goal' },
     hints: [
-      'Andar é chamar mover_direita com o número de casas: conte do P até o G.',
+      'Andar é chamar mover_direita com o número de casas: conte do início até o portão.',
       'São 10 casas: mover_direita(10);',
     ],
     cheatSheet: world1Cheat,
@@ -105,7 +105,7 @@ export const WORLD1_LEVELS: Level[] = [
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 1) Crie uma variável let passos com quantas casas faltam até o G
+    starterCode: `// 👉 1) Crie uma variável let passos com quantas casas faltam até o portão
 //     2) Passe a variável ao comando: mover_direita(passos);
 `,
     solution: `let passos = 8;
@@ -125,7 +125,7 @@ mover_direita(passos);
     success: { type: 'reach_goal' },
     hints: [
       'let passos = ?; cria a variável; depois passe passos ao comando.',
-      'Conte do P até o G: são 8 casas.',
+      'Conte do início até o portão: são 8 casas.',
     ],
     cheatSheet: world1Cheat,
   },
@@ -155,7 +155,7 @@ mover_direita(passos);
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
     starterCode: `// O Rust está travando este código (erro E0384).
-// Conserte para chegar ao G.
+// Conserte para chegar ao portão.
 let passos = 1;
 passos = 7;
 mover_direita(passos);
@@ -210,7 +210,7 @@ mover_direita(passos);
     starterCode: `// 👉 1) Crie a variável pulo com a força (casas do buraco)
 //     2) Ande até a última casa firme
 //     3) pular(pulo);
-//     4) Siga até o G
+//     4) Siga até o portão
 `,
     solution: `mover_direita(3);
 let pulo = 2;
@@ -252,7 +252,7 @@ mover_direita(5);
     },
     learnAfter: {
       title: 'Você planejou uma rota inteira',
-      body: 'Decompor um problema grande (chegar ao G) em passos pequenos (andar, pular, pular) é o coração de programar. Cada obstáculo virou uma linha do seu plano.',
+      body: 'Decompor um problema grande (chegar ao portão) em passos pequenos (andar, pular, pular) é o coração de programar. Cada obstáculo virou uma linha do seu plano.',
       bullets: [
         'Sequência: andar → salto fino → salto espinho → salto fino',
         'Variáveis guardam as medidas do caminho',
@@ -263,7 +263,7 @@ mover_direita(5);
 // 1) Caminhe até a casa antes do 1º buraco (1 casa) e pule com força 1
 // 2) Ande até a casa antes do espinho e pule com força 2
 // 3) Ande até a casa antes do 2º buraco e pule com força 1
-// 4) Siga até o G — a moeda no caminho é OBRIGATÓRIA
+// 4) Siga até o portão — a moeda no caminho é OBRIGATÓRIA
 `,
     solution: `let passos = 4;
 mover_direita(passos);
@@ -288,7 +288,7 @@ mover_direita(4);
     success: { type: 'reach_goal_all_coins' },
     hints: [
       'Obstáculos na ordem: vão de 1 → força 1; espinho → salto de 2; vão de 1 → força 1. Pule sempre da casa anterior.',
-      'Mochila até x4 (a moeda fica no caminho); depois três saltos e um trecho reto até o G.',
+      'Caminhe 4 até x4 (a moeda fica no caminho); depois três saltos intercalados com trechos retos até o portão.',
     ],
     cheatSheet: world1Cheat,
   },

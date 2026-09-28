@@ -70,7 +70,7 @@ export const WORLD6_LEVELS: Level[] = [
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar', 'falar'],
     starterCode: `// 👉 1) let msg = "..."; → escreva a senha da ruína entre aspas
 //     2) falar(msg); → diga a senha (uma vez só)
-//     3) mover_direita(?); → conte as casas até o G
+//     3) mover_direita(?); → conte as casas até o portão
 `,
     solution: `let msg = "Portão aberto!";
 falar(msg);
@@ -90,7 +90,7 @@ mover_direita(10);
     success: { type: 'reach_goal' },
     hints: [
       'Crie o texto com let msg = "..."; e entregue a falar com falar(msg);',
-      'Depois é só caminhar: o G está 10 casas à direita do P.',
+      'Depois é só caminhar: o portão está 10 casas à direita do seu ponto de partida.',
     ],
     cheatSheet: world6Cheat,
   },
@@ -121,18 +121,18 @@ mover_direita(10);
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar', 'falar'],
     starterCode: `// O Rust travou este código com erro E0382.
 // A senha foi movida no 1º falar — ela some na 2ª chamada.
-// Conserte as chamadas e chegue ao G.
+// Conserte as chamadas e chegue ao portão.
 let senha = "pedra-verde";
 falar(senha);
 falar(senha);
-// 👉 Depois: mover_direita(9); até o G
+// 👉 Depois: mover_direita(9); até o portão
 `,
     solution: `let senha = "pedra-verde";
 falar(&senha);
 falar(&senha);
 mover_direita(9);
 `,
-    // 12×8: P0, moeda x5, G x9 — rota reta após o conserto
+    // 12×8: P0, moeda x6, G x9 — rota reta após o conserto
     map: [
       '............',
       '............',
@@ -155,7 +155,7 @@ mover_direita(9);
     world: 6,
     order: 3,
     title: 'A Chave Emprestada',
-    narrative: 'Dois portões pedem a mesma senha: empreste o texto com & para usá-lo em dois momentos diferentes.',
+    narrative: 'A senha é dita duas vezes — ao sair e de novo na borda do vão: empreste o texto com & para reusá-lo.',
     concept: {
       title: '&: empréstimo sem mover',
       body: 'Antes de um identificador, & significa "só estou olhando": falar(&msg) empresta o texto sem tirar a posse de msg. Como nada foi movido, msg continua viva e pode ser usada de novo — quantas vezes você quiser.',
@@ -175,7 +175,7 @@ mover_direita(9);
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar', 'falar'],
-    starterCode: `// 👉 1) let msg = "..."; → a senha dos dois portões
+    starterCode: `// 👉 1) let msg = "..."; → a senha que você vai falar duas vezes
 //     2) falar(&msg); ANTES de sair e de novo NA borda do vão
 //     3) Rota: mover_direita(5); pular(2); mover_direita(4);
 `,
@@ -200,7 +200,7 @@ mover_direita(4);
     success: { type: 'reach_goal' },
     hints: [
       'Passe &msg nas DUAS falas: o empréstimo deixa msg viva para a segunda.',
-      'Rota: 5 casas até a borda (x5), falar de novo, pular(2) e 4 casas até o G.',
+      'Rota: 5 casas até a borda (x5), falar de novo, pular(2) e 4 casas até o portão.',
     ],
     cheatSheet: world6Cheat,
   },
@@ -258,7 +258,7 @@ mover_direita(5);
     success: { type: 'reach_goal' },
     hints: [
       'A fn recebe t: String, mas quem chama deve passar &msg — senão msg morre já na 1ª chamada.',
-      'anunciar(&msg); → 4 casas até a borda, pular(2) sobre o espinho, anunciar(&msg); e 5 casas até o G.',
+      'anunciar(&msg); → 4 casas até a borda, pular(2) sobre o espinho, anunciar(&msg); e 5 casas até o portão.',
     ],
     cheatSheet: world6Cheat,
   },
@@ -274,7 +274,7 @@ mover_direita(5);
       bullets: [
         'for i in 0..3 { mover_direita(2); } → 3 repetições',
         'anunciar(&saudacao); → fala sem mover o texto',
-        'Moeda obrigatória: colete antes de ir ao G',
+        'Moeda obrigatória: colete antes de ir ao portão',
       ],
     },
     learnAfter: {
@@ -283,7 +283,7 @@ mover_direita(5);
       bullets: [
         'for repetiu a caminhada sem copiar e colar',
         'anunciar reusou a mesma saudação com &msg',
-        'Moeda + G = selo completo',
+        'Moeda + portão = selo completo',
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar', 'falar'],
@@ -292,7 +292,7 @@ mover_direita(5);
 // 2) let saudacao = "..."; → anunciar(&saudacao); abre o ritual
 // 3) for i in 0..3 { mover_direita(2); } → 6 casas até a borda (coleta a moeda)
 // 4) pular(2); mover_direita(3); → para em x9, antes do espinho
-// 5) pular(2); anunciar(&saudacao); mover_direita(4); → rumo ao G
+// 5) pular(2); anunciar(&saudacao); mover_direita(4); → rumo ao portão
 `,
     solution: `fn anunciar(t: String) {
   falar(t);
@@ -322,7 +322,7 @@ mover_direita(4);
     success: { type: 'reach_goal_all_coins' },
     hints: [
       'O for repete 3× mover_direita(2) → 6 casas até a borda do vão, coletando a moeda no caminho.',
-      'Depois: pular(2) e 3 casas até x9; pular(2) de novo (espinho), anunciar(&saudacao); e 4 casas até o G.',
+      'Depois: pular(2) e 3 casas até x9; pular(2) de novo (espinho), anunciar(&saudacao); e 4 casas até o portão.',
     ],
     cheatSheet: world6Cheat,
   },

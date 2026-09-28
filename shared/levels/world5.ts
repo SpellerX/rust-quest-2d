@@ -60,7 +60,7 @@ export const WORLD5_LEVELS: Level[] = [
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
     starterCode: `// 👉 1) Crie a função: fn ir() { mover_direita(3); }
-//     2) Chame ir(); três vezes para somar as 9 casas até o G.
+//     2) Chame ir(); três vezes para somar as 9 casas até o portão.
 `,
     solution: `fn ir() {
   mover_direita(3);
@@ -83,7 +83,7 @@ ir();
     success: { type: 'reach_goal' },
     hints: [
       'Uma fn sem parâmetro é chamada só com o nome: ir(); — e cada chamada vale por mover_direita(3);',
-      'São 9 casas até o G: se cada chamada anda 3, chame ir(); três vezes.',
+      'São 9 casas até o portão: se cada chamada anda 3, chame ir(); três vezes.',
     ],
     cheatSheet: world5Cheat,
   },
@@ -113,7 +113,7 @@ ir();
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
     starterCode: `// 👉 1) Escreva a função: fn caminhar(n: i32) { mover_direita(n); }
-//     2) Chame caminhar(4); três vezes — são 12 casas até o G.
+//     2) Chame caminhar(4); três vezes — são 12 casas até o portão.
 `,
     solution: `fn caminhar(n: i32) {
   mover_direita(n);
@@ -136,7 +136,7 @@ caminhar(4);
     success: { type: 'reach_goal' },
     hints: [
       'O parâmetro fica entre parênteses com tipo: n: i32 — e dentro do corpo use o nome n.',
-      'caminhar(4); anda 4 casas; o G está 12 casas à direita → três chamadas.',
+      'caminhar(4); anda 4 casas; o portão está 12 casas à direita → três chamadas.',
     ],
     cheatSheet: world5Cheat,
   },
@@ -191,7 +191,7 @@ trecho(5, 2);
     success: { type: 'reach_goal' },
     hints: [
       'trecho(n, f) anda n casas e depois arma pular(f) — use-o para ir de borda a borda.',
-      'São 3 trechos: até a 1ª borda (2 casas), cruzar o 1º vão e parar na 2ª borda (5), cruzar o 2º vão até o G (5).',
+      'São 3 trechos: até a 1ª borda (2 casas), cruzar o 1º vão e parar na 2ª borda (5), cruzar o 2º vão até o portão (5).',
     ],
     cheatSheet: world5Cheat,
   },
@@ -223,7 +223,7 @@ trecho(5, 2);
     starterCode: `// 👉 1) fn dobro(x: i32) -> i32 { ... } → devolva x * 2 SEM ; no fim
 //     2) mover_direita(dobro(3)); → 6 casas até a borda do vão
 //     3) pular(2); e cruze com mover_direita(dobro(2));
-//     4) Mais 2 casas até o G
+//     4) Mais 2 casas até o portão
 `,
     solution: `fn dobro(x: i32) -> i32 {
   x * 2

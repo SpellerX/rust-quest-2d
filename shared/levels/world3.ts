@@ -80,8 +80,8 @@ export const WORLD3_LEVELS: Level[] = [
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 A porta (G) está logo adiante. A condição já está pronta:
-// 1) Dentro do if { }, escreva o caminho COMPLETO até o G
+    starterCode: `// 👉 O portão está logo adiante. A condição já está pronta:
+// 1) Dentro do if { }, escreva o caminho COMPLETO até o portão
 // 2) Dentro do else { }, escreva o caminho ERRADO (sem chave, não vence)
 // Lembre: cada linha termina com ; e os blocos usam { }
 `,
@@ -105,7 +105,7 @@ if tem_chave {
     ],
     success: { type: 'reach_goal' },
     hints: [
-      'tem_chave é true, então o caminho COMPLETO até o G deve ficar dentro do bloco do if.',
+      'tem_chave é true, então o caminho COMPLETO até o portão deve ficar dentro do bloco do if.',
       'Dentro do if: mover_direita(11);. No else, um trecho curto como mover_direita(3); não vence.',
     ],
     cheatSheet: world3BaseCheat,
@@ -135,10 +135,10 @@ if tem_chave {
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 O G está 9 casas adiante, com uma moeda no caminho.
+    starterCode: `// 👉 O portão está 9 casas adiante, com uma moeda no caminho.
 // 1) Crie a variável energia com a conta 1 + 2
 // 2) Teste: if energia > 0 { ... } else { ... }
-// 3) No if, caminhe até o G; no else, escreva um caminho que NÃO vence
+// 3) No if, caminhe até o portão; no else, escreva um caminho que NÃO vence
 `,
     solution: `let energia = 1 + 2;
 if energia > 0 {
@@ -160,7 +160,7 @@ if energia > 0 {
     ],
     success: { type: 'reach_goal' },
     hints: [
-      'A conta vale 3, e 3 > 0 é true — o caminho até o G fica no bloco do if.',
+      'A conta vale 3, e 3 > 0 é true — o caminho até o portão fica no bloco do if.',
       'Monte: let energia = 1 + 2; if energia > 0 { mover_direita(9); } else { mover_direita(3); }',
     ],
     cheatSheet: world3BaseCheat,
@@ -194,7 +194,7 @@ if energia > 0 {
 //     if largura >= 2 && largura <= 3 { ... } else { ... }
 // 1) Ande até a última casa firme antes do vão
 // 2) No if, pule com força 2; no else, com força 1 (a errada)
-// 3) Continue até o G
+// 3) Continue até o portão
 `,
     solution: `let largura = 2;
 mover_direita(3);
@@ -219,7 +219,7 @@ mover_direita(5);
     success: { type: 'reach_goal' },
     hints: [
       'A faixa usa duas comparações ligadas por &&: largura >= 2 && largura <= 3 — só entra no if se as DUAS valerem.',
-      'Ande 3 casas até a borda (x3), pular(2) cruza o vão de 2 e sobra mover_direita(5) até o G.',
+      'Ande 3 casas até a borda (x3), pular(2) cruza o vão de 2 e sobra mover_direita(5) até o portão.',
     ],
     cheatSheet: world3LogicCheat,
   },
@@ -312,7 +312,7 @@ if !aprovado {
     starterCode: `// 👉 Dois vãos na trilha (meça no mapa!):
 // 1) Até a borda do 1º vão → decida a força: if largura_a >= 2 { } else { }
 // 2) Até a borda do 2º vão → repita com if largura_b ...
-// 3) Siga até o G
+// 3) Siga até o portão
 // O 1º vão tem 1 casa (x4) e o 2º tem 2 casas (x7–x8).
 `,
     solution: `let largura_a = 1;
@@ -345,7 +345,7 @@ mover_direita(4);
     success: { type: 'reach_goal' },
     hints: [
       'Meça pelo mapa: o 1º vão tem 1 casa (x4) e o 2º tem 2 casas (x7–x8) — cada if escolhe a força do seu vão.',
-      'Sequência: ande 3 → decisão do largura_a; ande 3 (até a borda x6) → decisão do largura_b; ande 4 até o G.',
+      'Sequência: ande 3 → decisão do largura_a; ande 3 (até a borda x6) → decisão do largura_b; ande 4 até o portão.',
     ],
     cheatSheet: world3LogicCheat,
   },

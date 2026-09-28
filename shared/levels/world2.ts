@@ -117,7 +117,7 @@ mover_direita(6);
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 O G está 6 casas adiante.
+    starterCode: `// 👉 O portão está 6 casas adiante.
 // Escreva uma divisão usando o número 12 que resulte em 6.
 `,
     solution: `let passos = 12 / 2;
@@ -137,7 +137,7 @@ mover_direita(passos);
     success: { type: 'reach_goal' },
     hints: [
       'Divisão / entre inteiros devolve inteiro: 12 / 2 vale 6.',
-      'O G está na casa 6 — a divisão precisa dar 6.',
+      'O portão está na casa 6 — a divisão precisa dar 6.',
     ],
     cheatSheet: world2Cheat,
   },
@@ -203,28 +203,28 @@ mover_direita(10);
       bullets: [
         'let volta = avanco - 4; → usa o valor de antes',
         'Variáveis podem ser usadas em outras contas',
-        'Sem a moeda, chegar ao G não vale',
+        'Sem a moeda, chegar ao portão não vale',
       ],
     },
     learnAfter: {
       title: 'Você calculou ida e volta',
       body: 'Reaproveitar uma variável (avanco) dentro de outra conta (volta = avanco - 4) é programação de verdade: valores circulam pelo programa.',
       bullets: [
-        '4 * 3 = 12 (ida até a moeda)',
-        '12 - 4 = 8 (volta até o G)',
+        '4 * 3 = 12 (ida passando pela moeda)',
+        '12 - 4 = 8 (volta até o portão)',
         'mover_esquerda inverte o caminho',
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 1) Vá até a moeda: a distância é 4 * 3 casas
-//     2) Volte até o G usando uma subtração a partir do avanço
+    starterCode: `// 👉 1) Avance 4 * 3 = 12 casas — você passa pela moeda no caminho
+//     2) Volte até o portão usando uma subtração a partir do avanço
 `,
     solution: `let avanco = 4 * 3;
 mover_direita(avanco);
 let volta = avanco - 4;
 mover_esquerda(volta);
 `,
-    // 13×8: P0, G x4, moeda x10
+    // 13×8: P0, G x4, moeda x11
     map: [
       '.............',
       '.............',
@@ -237,8 +237,8 @@ mover_esquerda(volta);
     ],
     success: { type: 'reach_goal_all_coins' },
     hints: [
-      'Sem a moeda o G não vale — colete passando por ela antes de voltar.',
-      'volta = avanco - 4 → 8 casas para a esquerda até o G.',
+      'Sem a moeda o portão não vale — colete passando por ela antes de voltar.',
+      'volta = avanco - 4 → 8 casas para a esquerda até o portão.',
     ],
     cheatSheet: world2Cheat,
   },
@@ -250,7 +250,7 @@ mover_esquerda(volta);
     narrative: 'A prova final dos Engenheiros de Código: um vão largo e uma torre para escalar, expressando tudo com contas.',
     concept: {
       title: 'Tudo junto: variáveis, contas e salto',
-      body: 'Nesta torre você combina o Mundo 1 e o Mundo 2: variáveis guardam as medidas, expressões calculam as forças e cada salto resolve um trecho — buraco embaixo, depois subir dois degraus até o G.',
+      body: 'Nesta torre você combina o Mundo 1 e o Mundo 2: variáveis guardam as medidas, expressões calculam as forças e cada salto resolve um trecho — buraco embaixo, depois subir dois degraus até o portão.',
       bullets: [
         'forca = 1 + 1 → força 2 (vão e subidas)',
         'passos = 2 * 2 → 4 casas por trecho',
@@ -270,7 +270,7 @@ mover_esquerda(volta);
     starterCode: `// 👉 Plano da torre (3 saltos):
 // 1) Ande até a borda do vão (x5) e cruze com força 2
 // 2) Suba o 1º degrau (força 2) e ande 4 casas no patamar
-// 3) Suba o 2º degrau (força 2) e avance até o G
+// 3) Suba o 2º degrau (força 2) e avance até o portão
 // Monte as forças com contas ( + e * ), não com números soltos.
 `,
     solution: `let forca = 1 + 1;
@@ -304,7 +304,7 @@ mover_direita(1);
     success: { type: 'reach_goal' },
     hints: [
       'Toda subida de 1 degrau pede força 2 — e ela começa na casa anterior ao bloco.',
-      '3 saltos na sequência: vão (comece em x5), subir 1 degrau (em x9), subir para o G (em x13).',
+      '3 saltos na sequência: vão (comece em x5), subir 1 degrau (em x9), subir para o portão (em x13).',
     ],
     cheatSheet: world2Cheat,
   },

@@ -77,7 +77,7 @@ export const WORLD4_LEVELS: Level[] = [
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 Atravesse as 10 casas até o G usando um laço:
+    starterCode: `// 👉 Atravesse as 10 casas até o portão usando um laço:
 // 1) let mut passos = 0;
 // 2) loop { ande 1 casa; passos = passos + 1; if passos >= 10 { break; } }
 // O break é OBRIGATÓRIO: sem ele, o loop nunca termina.
@@ -134,7 +134,7 @@ loop {
       ],
     },
     allowedFunctions: ['mover_direita', 'mover_esquerda', 'pular', 'esperar'],
-    starterCode: `// 👉 Dê exatamente 8 passos até o G com um laço while:
+    starterCode: `// 👉 Dê exatamente 8 passos até o portão com um laço while:
 // 1) let mut cont = 0;
 // 2) while cont < 8 { mover_direita(1); cont = cont + 1; }
 // A condição do while precisa ser true/false — use a comparação cont < 8.
@@ -159,7 +159,7 @@ while cont < 8 {
     success: { type: 'reach_goal' },
     hints: [
       'O while repete enquanto cont < 8 for true: dentro dele, ande 1 casa e some 1 ao contador.',
-      'São 8 casas até o G: while cont < 8 { mover_direita(1); cont = cont + 1; }',
+      'São 8 casas até o portão: while cont < 8 { mover_direita(1); cont = cont + 1; }',
     ],
     cheatSheet: world4Cheat,
   },
@@ -214,7 +214,7 @@ for i in 0..3 {
     success: { type: 'reach_goal' },
     hints: [
       'Primeiro ande 3 casas até a borda (x3). Depois o mesmo bloco 3 vezes: pular(1) na borda e mover_direita(4) até a próxima borda.',
-      'mover_direita(3); for i in 0..3 { pular(1); mover_direita(4); } — o último movimento termina no G.',
+      'mover_direita(3); for i in 0..3 { pular(1); mover_direita(4); } — o último movimento termina no portão.',
     ],
     cheatSheet: world4Cheat,
   },
@@ -247,7 +247,7 @@ for i in 0..3 {
 // 1) let mut passo = 0;
 // 2) loop { mover_direita(1); passo = passo + 1; if passo >= 4 { break; } }
 // 3) Depois do laço: pular(2); passa por cima do espinho
-// 4) Continue até o G
+// 4) Continue até o portão
 // Sem o break, o loop caminharia em cima do espinho.
 `,
     solution: `let mut passo = 0;
@@ -275,7 +275,7 @@ mover_direita(8);
     success: { type: 'reach_goal' },
     hints: [
       'O espinho está em x5: a última casa firme é x4, então o laço precisa dar 4 passos e dar break.',
-      'Depois do break: pular(2); voa sobre o espinho; então mover_direita(8); leva até o G.',
+      'Depois do break: pular(2); voa sobre o espinho; então mover_direita(8); leva até o portão.',
     ],
     cheatSheet: world4Cheat,
   },
@@ -310,7 +310,7 @@ mover_direita(8);
 // 3) Dentro: let forca = 2 + i / 2;  → as forças ficam 2, 2 e 3
 //    (i / 2 vale 0, 0 e 1 — divisão inteira trunca a fração)
 //    Depois: pular(forca); e mover_direita(5); até a próxima borda
-// 4) Depois do laço: mover_direita(2); até o G
+// 4) Depois do laço: mover_direita(2); até o portão
 // As moedas sobre os abismos: só quem voa com a força exata as coleta!
 `,
     solution: `mover_direita(3);
