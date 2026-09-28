@@ -196,7 +196,21 @@ onMounted(() => {
 
 const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
 const DESCRIPTION
-  = 'Mapa dos 30 níveis do Rust Quest 2D: 6 mundos que ensinam Rust do let ao ownership — Vila das Variáveis até as Ruínas da Posse. Os 3 primeiros níveis são grátis sem cadastro.'
+  = 'Mapa dos 30 níveis do Rust Quest 2D: 6 mundos que ensinam Rust do let ao ownership. Os 3 primeiros níveis são grátis sem cadastro.'
+
+const mapaJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Mapa dos níveis — Rust Quest 2D',
+  description: DESCRIPTION,
+  inLanguage: 'pt-BR',
+  url: `${SITE_URL}/mapa`,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/mapa` },
+  image: `${SITE_URL}/og.png`,
+  about: { '@type': 'Thing', name: 'Rust', sameAs: 'https://www.rust-lang.org/' },
+  isPartOf: { '@type': 'WebSite', name: 'Rust Quest 2D', url: SITE_URL },
+  numberOfItems: LEVELS.length,
+}
 
 useSeoMeta({
   title: 'Mapa dos níveis — aprenda Rust em 6 mundos | Rust Quest 2D',
@@ -213,6 +227,7 @@ useSeoMeta({
 
 useHead({
   link: [{ rel: 'canonical', href: `${SITE_URL}/mapa` }],
+  script: [{ type: 'application/ld+json' as const, innerHTML: JSON.stringify(mapaJsonLd) }],
 })
 </script>
 

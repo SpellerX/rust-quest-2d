@@ -1,0 +1,63 @@
+# Rust Quest 2D
+
+> A free browser game that teaches the Rust programming language by playing. You write real
+> Rust code in an editor, the pixel character executes it, and you beat a level. 30 levels in
+> 6 worlds, from `let` up to ownership (`move` / `&`), following the progression of the
+> official book *The Rust Programming Language*. All content is in Brazilian Portuguese
+> (pt-BR). No install required; the first 3 levels are free without an account.
+
+## Play
+
+- [Home](https://rust-quest-2d-one.vercel.app/): pitch, FAQ and the 3 free levels
+- [Adventure map](https://rust-quest-2d-one.vercel.app/mapa): all 30 levels grouped by world, with stars and unlock state
+- [Level 1 — Primeiros Passos](https://rust-quest-2d-one.vercel.app/nivel/w1-l1): first free level, no signup
+
+Levels follow the URL pattern `https://rust-quest-2d-one.vercel.app/nivel/<world>-<order>`,
+with `<world>` from 1 to 6 and `<order>` from 1 to 5 (e.g. `/nivel/w6-l2`).
+
+## Learn — Biblioteca do Aventureiro
+
+Theory chapters, one per concept, each written from the official Rust book and linked from
+the in-game victory screen. Index: https://rust-quest-2d-one.vercel.app/biblioteca
+
+### Mundo 1 — Vila das Variáveis
+- [Chamada de função](https://rust-quest-2d-one.vercel.app/biblioteca/chamada-de-funcao): o formato `nome(argumentos);` que faz o programa agir.
+- [Variáveis com let](https://rust-quest-2d-one.vercel.app/biblioteca/variaveis-let): colar um nome num valor para usar depois.
+- [let mut e mutabilidade](https://rust-quest-2d-one.vercel.app/biblioteca/mutabilidade): no Rust tudo nasce travado; `mut` autoriza a mudança.
+- [Argumentos e tipos](https://rust-quest-2d-one.vercel.app/biblioteca/argumentos): cada valor tem um `type` e o `type` precisa bater.
+- [Sequência e planejamento](https://rust-quest-2d-one.vercel.app/biblioteca/sequencia): o programa é um roteiro lido de cima para baixo.
+
+### Mundo 2 — Penhasco dos Operadores
+- [Operadores aritméticos](https://rust-quest-2d-one.vercel.app/biblioteca/operadores): `+`, `-`, `*`, `/`, `%` e a divisão inteira.
+- [Expressões e precedência](https://rust-quest-2d-one.vercel.app/biblioteca/expressoes): quase tudo em Rust produz valor.
+
+### Mundo 3 — Floresta das Decisões
+- [if e else](https://rust-quest-2d-one.vercel.app/biblioteca/if-else): o programa escolhe um caminho a partir de um `bool`.
+- [Comparações](https://rust-quest-2d-one.vercel.app/biblioteca/comparacoes): dois valores viram um `bool`.
+- [&&, || e !](https://rust-quest-2d-one.vercel.app/biblioteca/operadores-logicos): combinar várias perguntas numa só decisão.
+
+### Mundo 4 — Caverna da Repetição
+- [loop e contagem](https://rust-quest-2d-one.vercel.app/biblioteca/loop): repetição infinita que só o `break` encerra.
+- [while](https://rust-quest-2d-one.vercel.app/biblioteca/while): repete enquanto a condição for verdadeira.
+- [for e ranges](https://rust-quest-2d-one.vercel.app/biblioteca/for): repetição contada sem contador escrito à mão.
+- [break](https://rust-quest-2d-one.vercel.app/biblioteca/break): a alavanca que corta o laço na hora certa.
+
+### Mundo 5 — Oficina das Funções
+- [fn: suas próprias funções](https://rust-quest-2d-one.vercel.app/biblioteca/funcoes): guardar um plano num nome e reusar.
+- [Parâmetros e argumentos](https://rust-quest-2d-one.vercel.app/biblioteca/parametros): o lugar na receita e o valor na chamada.
+- [Retorno com -> i32](https://rust-quest-2d-one.vercel.app/biblioteca/retorno): o valor da última linha, sem `;`.
+
+### Mundo 6 — Ruínas da Posse
+- [String: texto no Rust](https://rust-quest-2d-one.vercel.app/biblioteca/string): texto que o programa é dono e que pode crescer.
+- [move: a posse se transfere](https://rust-quest-2d-one.vercel.app/biblioteca/move): entregar um valor invalida quem o entregou (E0382).
+- [Borrowing com &](https://rust-quest-2d-one.vercel.app/biblioteca/emprestimo): ler sem ser dono — `msg` continua viva.
+
+## Notes for crawlers
+
+- Every page is server-side rendered: the full teaching text is present in the HTML, no
+  JavaScript is required to read it.
+- Structured data (`TechArticle`, `LearningResource`, `CollectionPage`, `FAQPage`,
+  `BreadcrumbList`) is emitted as JSON-LD on the corresponding pages.
+- Canonical URLs, `lang="pt-BR"` and an XML sitemap are provided:
+  https://rust-quest-2d-one.vercel.app/sitemap.xml
+- `/login`, `/registro` and other account pages are `noindex` by design.

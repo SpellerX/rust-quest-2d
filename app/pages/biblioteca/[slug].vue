@@ -82,17 +82,23 @@ const nomePasso = capitulo ? NOMES_PASSOS[capitulo.passo] ?? '' : ''
 const niveis = capitulo ? LEVELS.filter(l => capitulo.niveis.includes(l.id)) : []
 
 const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
+const urlAtual = capitulo ? `${SITE_URL}/biblioteca/${capitulo.slug}` : `${SITE_URL}/biblioteca`
+
+/** Description curta: os buscadores cortam por volta de 155 caracteres. */
+const metaDescription = capitulo
+  ? cortaMeta(
+    `${capitulo.resumo} Capítulo da Biblioteca do Rust Quest 2D — com código Rust e as pegadinhas do conceito.`,
+  )
+  : 'Capítulos teóricos em português sobre let, if, loops, fn, String, ownership e borrowing, com referência ao livro oficial de Rust.'
 
 useSeoMeta({
   title: capitulo
     ? `${capitulo.titulo} — Biblioteca do Aventureiro | Rust Quest 2D`
-    : 'Biblioteca do Aventureiro — Rust Quest 2D',
-  description: capitulo
-    ? `${capitulo.resumo} ${capitulo.oQueVoceFez}`
-    : 'Capítulos teóricos do Rust Quest 2D.',
+    : 'Biblioteca do Aventureiro — teoria de cada conceito | Rust Quest 2D',
+  description: metaDescription,
   ogTitle: capitulo ? `${capitulo.titulo} — Biblioteca do Aventureiro` : undefined,
-  ogDescription: capitulo ? capitulo.resumo : undefined,
-  ogUrl: capitulo ? `${SITE_URL}/biblioteca/${capitulo.slug}` : undefined,
+  ogDescription: metaDescription,
+  ogUrl: capitulo ? urlAtual : undefined,
   ogImage: `${SITE_URL}/og.png`,
   ogType: 'article',
   ogLocale: 'pt_BR',
@@ -100,10 +106,57 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
+/** Número real de palavras do corpo — sinal de profundidade para buscadores e LLMs. */
+const palavrasCorpo = computed(() => {
+  if (!capitulo) return 0
+  const corpo = [
+    capitulo.oQueVoceFez,
+    ...capitulo.secoes.flatMap(secao => secao.paragrafos),
+    ...(capitulo.pegadinhas ?? []),
+  ].join(' ')
+  return corpo.split(/\s+/).filter(Boolean).length
+})
+
+const artigoJsonLd = computed(() => {
+  if (!capitulo) return null
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: capitulo.titulo,
+    description: capitulo.resumo,
+    inLanguage: 'pt-BR',
+    url: urlAtual,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': urlAtual },
+    image: `${SITE_URL}/og.png`,
+    wordCount: palavrasCorpo.value,
+    author: { '@type': 'Organization', name: 'Rust Quest 2D', url: SITE_URL },
+    publisher: { '@type': 'Organization', name: 'Rust Quest 2D', url: SITE_URL },
+    about: { '@type': 'Thing', name: 'Rust', sameAs: 'https://www.rust-lang.org/' },
+    isPartOf: { '@type': 'Book', name: 'Biblioteca do Aventureiro', url: `${SITE_URL}/biblioteca` },
+    articleSection: `Mundo ${capitulo.mundo} · passo ${capitulo.passo}`,
+  }
+})
+
+const migalhasJsonLd = computed(() => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Biblioteca', item: `${SITE_URL}/biblioteca` },
+    ...(capitulo
+      ? [{ '@type': 'ListItem', position: 3, name: capitulo.titulo, item: urlAtual }]
+      : []),
+  ],
+}))
+
 useHead({
-  link: capitulo
-    ? [{ rel: 'canonical', href: `${SITE_URL}/biblioteca/${capitulo.slug}` }]
-    : [],
+  link: capitulo ? [{ rel: 'canonical', href: urlAtual }] : [],
+  script: [
+    ...(artigoJsonLd.value
+      ? [{ type: 'application/ld+json' as const, innerHTML: JSON.stringify(artigoJsonLd.value) }]
+      : []),
+    { type: 'application/ld+json' as const, innerHTML: JSON.stringify(migalhasJsonLd.value) },
+  ],
 })
 </script>
 

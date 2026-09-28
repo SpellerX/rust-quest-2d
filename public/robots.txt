@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://rust-quest-2d-one.vercel.app/sitemap.xml
+
+# Resumo legível do site para crawlers de IA: /llms.txt

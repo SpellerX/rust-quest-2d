@@ -251,18 +251,58 @@ const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
 const levelTitle = computed(() =>
   level.value ? `${level.value.title} — nível ${level.value.order} | Rust Quest 2D` : 'Rust Quest 2D',
 )
+const levelUrl = computed(() => `${SITE_URL}/nivel/${String(route.params.id)}`)
+/** O tópico vem primeiro: se o texto for cortado pelo buscador, ele sobrevive. */
 const levelDescription = computed(() => {
   const l = level.value
   if (!l) return 'Aprenda Rust jogando: 30 níveis grátis no navegador.'
-  return `${l.narrative} Aprenda ${l.concept.title} em Rust neste nível ${l.order} do Mundo ${l.world} — grátis no navegador, sem instalar nada.`
+  return cortaMeta(`${l.concept.title} — ${l.narrative}`)
 })
+
+const nivelJsonLd = computed(() => {
+  const l = level.value
+  if (!l) return null
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: `${l.title} — nível ${l.order} do Mundo ${l.world}`,
+    description: levelDescription.value,
+    inLanguage: 'pt-BR',
+    url: levelUrl.value,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': levelUrl.value },
+    image: `${SITE_URL}/og.png`,
+    learningResourceType: 'Interactive exercise',
+    educationalLevel: 'Iniciante',
+    teaches: l.concept.title,
+    about: { '@type': 'Thing', name: 'Rust', sameAs: 'https://www.rust-lang.org/' },
+    isAccessibleForFree: isFreeLevel(l.id),
+    provider: { '@type': 'Organization', name: 'Rust Quest 2D', url: SITE_URL },
+    inDefinedTermSet: {
+      '@type': 'DefinedTermSet',
+      name: `Mundo ${l.world}`,
+      url: `${SITE_URL}/mapa`,
+    },
+  }
+})
+
+const migalhasJsonLd = computed(() => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Mapa', item: `${SITE_URL}/mapa` },
+    ...(level.value
+      ? [{ '@type': 'ListItem', position: 3, name: level.value.title, item: levelUrl.value }]
+      : []),
+  ],
+}))
 
 useSeoMeta({
   title: levelTitle,
   description: levelDescription,
   ogTitle: levelTitle,
   ogDescription: levelDescription,
-  ogUrl: computed(() => `${SITE_URL}/nivel/${String(route.params.id)}`),
+  ogUrl: levelUrl,
   ogImage: `${SITE_URL}/og.png`,
   ogType: 'website',
   ogLocale: 'pt_BR',
@@ -274,7 +314,13 @@ useSeoMeta({
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: computed(() => `${SITE_URL}/nivel/${String(route.params.id)}`) }],
+  link: [{ rel: 'canonical', href: levelUrl }],
+  script: [
+    ...(nivelJsonLd.value
+      ? [{ type: 'application/ld+json' as const, innerHTML: JSON.stringify(nivelJsonLd.value) }]
+      : []),
+    { type: 'application/ld+json' as const, innerHTML: JSON.stringify(migalhasJsonLd.value) },
+  ],
 })
 </script>
 

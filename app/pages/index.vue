@@ -99,7 +99,7 @@ const ctaLabel = computed(() => (loggedIn.value ? '▶ Continuar aventura' : '�
 
 const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
 const DESCRIPTION
-  = 'Jogo grátis para aprender Rust no navegador: 30 níveis do let ao ownership, com dicas, erros em português e estrelas. Os 3 primeiros níveis são sem cadastro.'
+  = 'Jogo grátis para aprender Rust no navegador: 30 níveis do let ao ownership, com dicas, erros em português e estrelas — 3 primeiros níveis sem cadastro.'
 
 const faq = [
   {

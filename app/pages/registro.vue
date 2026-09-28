@@ -95,9 +95,12 @@ async function copyCode() {
 useSeoMeta({
   title: 'Criar conta grátis — aprenda Rust | Rust Quest 2D',
   description: 'Crie sua conta gratuita e desbloqueie os 30 níveis do Rust Quest 2D. Salve estrelas, XP e progresso — sem instalar nada.',
+  /** Utilitária: fora do sitemap e fora do índice — o conteúdo indexável é o jogo. */
+  robots: 'noindex, follow',
   ogTitle: 'Criar conta grátis — Rust Quest 2D',
   ogUrl: 'https://rust-quest-2d-one.vercel.app/registro',
   ogImage: 'https://rust-quest-2d-one.vercel.app/og.png',
+  twitterCard: 'summary',
 })
 
 useHead({

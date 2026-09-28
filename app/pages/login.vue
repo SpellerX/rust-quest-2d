@@ -64,9 +64,12 @@ async function onSubmit() {
 useSeoMeta({
   title: 'Entrar — Rust Quest 2D',
   description: 'Entre na sua conta gratuita do Rust Quest 2D e continue aprendendo Rust: 30 níveis, estrelas e progresso salvos.',
+  /** Utilitária: fora do sitemap e fora do índice — o conteúdo indexável é o jogo. */
+  robots: 'noindex, follow',
   ogTitle: 'Entrar — Rust Quest 2D',
   ogUrl: 'https://rust-quest-2d-one.vercel.app/login',
   ogImage: 'https://rust-quest-2d-one.vercel.app/og.png',
+  twitterCard: 'summary',
 })
 
 useHead({

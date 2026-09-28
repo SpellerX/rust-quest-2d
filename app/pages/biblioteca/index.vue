@@ -122,7 +122,30 @@ onMounted(() => {
 
 const SITE_URL = 'https://rust-quest-2d-one.vercel.app'
 const DESCRIPTION
-  = 'Biblioteca do Rust Quest 2D: capítulos teóricos em português sobre let, if, loops, fn, String, ownership e borrowing — com referência ao livro oficial de Rust.'
+  = 'Biblioteca do Rust Quest 2D: capítulos em português sobre let, if, loops, fn, String, ownership e borrowing — com referência ao livro oficial de Rust.'
+
+const bibliotecaJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Biblioteca do Aventureiro — Rust Quest 2D',
+  description: DESCRIPTION,
+  inLanguage: 'pt-BR',
+  url: `${SITE_URL}/biblioteca`,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/biblioteca` },
+  image: `${SITE_URL}/og.png`,
+  about: { '@type': 'Thing', name: 'Rust', sameAs: 'https://www.rust-lang.org/' },
+  isPartOf: { '@type': 'WebSite', name: 'Rust Quest 2D', url: SITE_URL },
+  numberOfItems: CAPITULOS.length,
+}
+
+const migalhasJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Início', item: `${SITE_URL}/` },
+    { '@type': 'ListItem', position: 2, name: 'Biblioteca', item: `${SITE_URL}/biblioteca` },
+  ],
+}
 
 useSeoMeta({
   title: 'Biblioteca do Aventureiro — teoria de cada conceito | Rust Quest 2D',
@@ -139,6 +162,10 @@ useSeoMeta({
 
 useHead({
   link: [{ rel: 'canonical', href: `${SITE_URL}/biblioteca` }],
+  script: [
+    { type: 'application/ld+json' as const, innerHTML: JSON.stringify(bibliotecaJsonLd) },
+    { type: 'application/ld+json' as const, innerHTML: JSON.stringify(migalhasJsonLd) },
+  ],
 })
 </script>
 
